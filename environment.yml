@@ -1,7 +1,7 @@
 name: covid19
 dependencies:
  - python=3.7
- - numpy=1.15.4
+ - numpy=1.17.4
  - pandas=1.1.3
  - jupyter==1.0.0
  - matplotlib=3.2
@@ -9,3 +9,4 @@ dependencies:
  - cvxopt=1.2.0
  - scikit-learn=0.23
  - statsmodels
+ - pmdarima=1.5.2
