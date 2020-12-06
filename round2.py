@@ -8,6 +8,7 @@ from sklearn.preprocessing import PolynomialFeatures
 from statsmodels.tsa.api import ExponentialSmoothing, SimpleExpSmoothing, Holt
 from warnings import simplefilter
 from statsmodels.tools.sm_exceptions import ConvergenceWarning
+from pmdarima import auto_arima
 
 LIN_REG_RANGE = 50
 HOLT_RANGE = 40
@@ -87,11 +88,18 @@ def linreg(param, start_date, state):
     pred_data = predicted_cases[-7:]
     return pred_data
 
+def train_arima(param, state):
+    split = train2.loc[train2['Province_State'] == state][param].values
+    arima_model = auto_arima(split, seasonal=False, supress_warnings = True, start_p = 1, start_q = 0, max_p = 10)
+    predicted_cases = arima_model.predict(7)
+    return predicted_cases
+
 def train_full(param, opt_conf_start_holt, opt_death_start_holt):
     res = {}
     
-    start_conf = {'Hawaii': 80, 'Wyoming': 170, 'Arizona': 170, 'Alaska':170, 'Florida' : 170,
-                 'Oklahoma':150, 'Maine': 170, 'Vermont': 170}
+    start_conf = {'Alabama': 170, 'Hawaii': 170, 'Florida' : 170,
+                 'Oklahoma':150, 'Maine': 170, 'Vermont': 170, 'New Hampshire': 170, 'Minnesota': 170, 'Colorado': 170, 'Maryland': 170, 'Missouri':170,
+                 'Nebraska': 170, 'Oklahoma': 170, 'South Carolina': 170, 'South Dakota':170, 'Utah': 170, 'Virginia': 170}
     start_death = {'Arizona': 170, 'Idaho': 170, 'Wyoming': 170, 'Vermont': 170, 'Maine': 170}
     lin_states = {}
 
@@ -105,9 +113,21 @@ def train_full(param, opt_conf_start_holt, opt_death_start_holt):
 
     
     for state in np.unique(train2['Province_State']):
-        
+        split_test = train2_test.loc[train2_test['Province_State'] == state][param].values
+        try:
+            pred_arima = train_arima(param, state)
+            mape_arima = MAPE(pred_arima, split_test)
+        except:
+            pred_arima = []
+            mape_arima = 1000
+
         if state in lin_states:
-            res[state] = linreg(param, opt_lin_start[state], state)
+            pred_linreg = linreg(param, opt_lin_start[state], state)
+            mape_linreg = MAPE(pred_linreg, split_test)
+            if mape_arima < mape_linreg:
+                res[state] = pred_arima
+            else:
+                res[state] = pred_linreg
         else:
             # Holt Model
             split = train2.loc[train2['Province_State'] == state]
@@ -117,13 +137,18 @@ def train_full(param, opt_conf_start_holt, opt_death_start_holt):
                 split_train = split[param].to_numpy()[opt_conf_start_holt[state]:] 
             model = Holt(split_train)
             model_fit = model.fit()
-            predicted_cases = model_fit.forecast(7)
-            res[state] = predicted_cases
+            pred_holt = model_fit.forecast(7)
+            mape_holt = MAPE(pred_holt, split_test)
+            if mape_arima < mape_holt:
+                res[state] = pred_arima
+            else:
+                res[state] = pred_holt
     return res
 
 if __name__ == "__main__":
     simplefilter(action='ignore', category=FutureWarning)
     simplefilter('ignore', ConvergenceWarning)
+    simplefilter('ignore', UserWarning)
 
 
     opt_conf_start = {}
