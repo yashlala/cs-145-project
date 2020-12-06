@@ -175,7 +175,7 @@ def train_full(param, num_days_validation, start_dates):
         lin_states = start_conf
 
     # TODO: change up state logic.
-    linreg_start_dates_dict = linreg_start_dates(param, num_days_validation,
+    linreg_start_dates_dict, _ = linreg_start_dates(param, num_days_validation,
             LINREG_START_DATE_RANGE, lin_states)
     
     for state in np.unique(train['Province_State']):
