@@ -48,21 +48,21 @@ def MAPE(predicted, actual):
 
 
 def holt_start_dates(param, num_days_validation, day_range):
-    '''Returns the optimal start dates for the HOLT simulation
+    '''Returns the optimal start dates for the HOLT simulation.
 
     param: Attribute to optimize (eg. "Deaths")
     num_days_validation: How many days to validate on. 
-    day_range: The number of days to train over
+    day_range: The number of days to train over.
     '''
 
-    opt_split = {}
+    start_dates = {}
     total_err = 0
     for state in np.unique(train['Province_State']):
         split = train.loc[train['Province_State'] == state]
         min_mape = 100
         for i in range(HOLT_START_DATE - day_range//2, 
                 HOLT_START_DATE + day_range//2):
-          split_train = split[param].iloc[i:-num_days_validation].to_numpy() # why start at 40? should this be tuned?
+          split_train = split[param].iloc[i:-num_days_validation].to_numpy() 
           split_valid = split[param].iloc[-num_days_validation:].to_numpy()
           model = Holt(split_train)
           model_fit = model.fit()
@@ -70,19 +70,33 @@ def holt_start_dates(param, num_days_validation, day_range):
           mape = MAPE(predicted_cases, split_valid)
           if mape < min_mape:
             min_mape = mape
-            opt_split[state] = i
+            start_dates[state] = i
         total_err += len(predicted_cases) * min_mape
-    return total_err/(num_days_validation*50)
+
+    # TODO: Return individualized state MAPE -- probably go state by state in
+    # toplevel method? 
+    return start_dates, total_err/(num_days_validation*50)
 
 
-def linreg_start_dates(param, t_size, day_range, opt_starts, states):
+def linreg_start_dates(param, num_days_validation, day_range, states):
+    '''Returns the optimal start dates for the Linear Regression simulation.
+
+    param: Attribute to optimize (eg. "Deaths")
+    num_days_validation: How many days to validate on. 
+    day_range: The number of days to train over.
+    states: hardcoded dictionary of which states to predict over with linear
+    regression. 
+    '''
+    # TODO: Remove state logic, move to toplevel run_all. 
+
+    start_dates = {}
     total_err = 0
     for state in states:
         min_mape = 100
-        for i in range(states[state] - day_range, states[state] + day_range):
+        for i in range(states[state] - day_range//2, states[state] + day_range//2):
             split = train.loc[train['Province_State'] == state]
-            split_train = split[param].iloc[i:-t_size].to_numpy()
-            split_test = split[param].iloc[-t_size:].to_numpy()
+            split_train = split[param].iloc[i:-num_days_validation].to_numpy()
+            split_test = split[param].iloc[-num_days_validation:].to_numpy()
 
             x_axis = len(split_train)
             #x axis is days after april 1st + start_date
@@ -90,19 +104,25 @@ def linreg_start_dates(param, t_size, day_range, opt_starts, states):
             cal_lin_train_x = ids.reshape(-1,1)
 
             model = LinearRegression().fit(cal_lin_train_x, split_train)
-            future = np.linspace(0,states[state] + x_axis+t_size,states[state]+x_axis+t_size)
+            future = np.linspace(0, 
+                    states[state] + x_axis + num_days_validation,
+                    states[state] + x_axis + num_days_validation)
             cal_lin_test_x = future.reshape(-1,1)
 
             predicted_y = model.predict(cal_lin_test_x)
             predicted_cases = predicted_y 
 
-            mape = MAPE(predicted_cases[-t_size::], split_test)
+            mape = MAPE(predicted_cases[-num_days_validation::], split_test)
             if mape < min_mape:
                 min_mape = mape
-                opt_starts[state] = i
+                start_dates[state] = i
                 
-        total_err += len(predicted_cases[-t_size::]) * min_mape
-    return total_err/(t_size*50)
+        total_err += len(predicted_cases[-num_days_validation::]) * min_mape
+
+    # TODO: Return individualized state MAPE -- probably go state by state in
+    # toplevel method? 
+    return start_dates, total_err/(num_days_validation*50)
+
 
 def linreg(param, start_date, state):
     split = train.loc[train['Province_State'] == state]
