@@ -205,14 +205,21 @@ if __name__ == "__main__":
 
     # Find optimal training start-dates for our models. 
     # Optimal dates to start training for confirmed and death cases. 
-    conf_start_dates_conf = {}
-    death_start_dates_death = {}
-    pure_holt = holt_start_dates('Deaths', VALIDATION_DATA_SIZE, HOLT_RANGE, start_dates_death)
-    pure_d_holt = holt_start_dates('Confirmed', VALIDATION_DATA_SIZE, HOLT_RANGE, start_dates_conf)
+    conf_start_dates = {}
+    death_start_dates = {}
+    # TODO: record MAPE below
+    death_holt_start_dates, _ = holt_start_dates('Deaths', 
+            NUM_DAYS_VALIDATION,
+            HOLT_START_DATE_RANGE)
+    conf_holt_start_dates, _ = holt_start_dates('Confirmed',
+            NUM_DAYS_VALIDATION,
+            HOLT_START_DATE_RANGE)
 
     # Train the models given the optimized start dates. 
-    conf_results = train_full('Confirmed', VALIDATION_DATA_SIZE, start_dates_conf, start_dates_death)
-    death_results = train_full('Deaths', VALIDATION_DATA_SIZE, start_dates_conf, start_dates_death)
+    death_results = train_full('Deaths', 
+            NUM_DAYS_VALIDATION, death_holt_start_dates)
+    conf_results = train_full('Confirmed', 
+            NUM_DAYS_VALIDATION, conf_holt_start_dates)
 
     # TODO: Output to CSV 
 
