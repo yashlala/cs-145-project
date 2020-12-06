@@ -8,17 +8,35 @@ from statsmodels.tsa.api import ExponentialSmoothing, SimpleExpSmoothing, Holt
 from warnings import simplefilter
 from statsmodels.tools.sm_exceptions import ConvergenceWarning
 
+# ################
 # Hyperparameters
+# ################
 
-# The number of days to test. 
+# The number of days to test on. 
 # eg. All but the last 7 days are trained on, the last 7 days will be reserved
 # for testing data. 
 NUM_DAYS_TESTING = 7
 
-LIN_REG_RANGE = 50
-HOLT_RANGE = 40
-T_SIZE = 7
-train2 = None
+# The number of days to validate on. 
+# eg. All but the last 7 days are trained on, the last 7 days will be reserved
+# for validateing data. 
+NUM_DAYS_VALIDATION = 7
+
+# Models are validated with different "training start dates". 
+# These values determine the middle of the range of starting dates to check
+# over. 
+# 
+# TODO: triple check this logic, switch to a "start date" and a "end date"
+HOLT_START_DATE = 40
+LINREG_START_DATE = 170
+
+# These values determine the range of days to check over. 
+# TODO: triple check as above. 
+HOLT_START_DATE_RANGE = 80
+LINREG_START_DATE_RANGE = 100
+
+train = None
+
 
 def MAPE(predicted, actual):
     assert len(predicted) == len(actual)
@@ -141,12 +159,12 @@ if __name__ == "__main__":
     # Optimal dates to start training for confirmed and death cases. 
     conf_start_dates_conf = {}
     death_start_dates_death = {}
-    pure_holt = get_opt_toy('Deaths', T_SIZE, HOLT_RANGE, start_dates_death)
-    pure_d_holt = get_opt_toy('Confirmed', T_SIZE, HOLT_RANGE, start_dates_conf)
+    pure_holt = holt_start_dates('Deaths', VALIDATION_DATA_SIZE, HOLT_RANGE, start_dates_death)
+    pure_d_holt = holt_start_dates('Confirmed', VALIDATION_DATA_SIZE, HOLT_RANGE, start_dates_conf)
 
     # Train the models given the optimized start dates. 
-    conf_results = train_full('Confirmed', T_SIZE, start_dates_conf, start_dates_death)
-    death_results = train_full('Deaths', T_SIZE, start_dates_conf, start_dates_death)
+    conf_results = train_full('Confirmed', VALIDATION_DATA_SIZE, start_dates_conf, start_dates_death)
+    death_results = train_full('Deaths', VALIDATION_DATA_SIZE, start_dates_conf, start_dates_death)
 
     # TODO: Output to CSV 
 
