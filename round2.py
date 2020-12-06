@@ -48,7 +48,7 @@ def MAPE(predicted, actual):
     return (res/len(predicted)) * 100
 
 
-def holt_start_dates(param, num_days_validation, day_range):
+def holt_start_dates(param, num_days_validation, day_range, train_data):
     '''Returns the optimal start dates for the HOLT simulation.
 
     param: Attribute to optimize (eg. "Deaths")
@@ -56,30 +56,28 @@ def holt_start_dates(param, num_days_validation, day_range):
     day_range: The number of days to train over.
     '''
 
-    start_dates = {}
+    start_date = None
     total_err = 0
-    for state in np.unique(train['Province_State']):
-        split = train.loc[train['Province_State'] == state]
-        min_mape = 100
-        for i in range(HOLT_START_DATE - day_range//2, 
-                HOLT_START_DATE + day_range//2):
-          split_train = split[param].iloc[i:-num_days_validation].to_numpy() 
-          split_valid = split[param].iloc[-num_days_validation:].to_numpy()
-          model = Holt(split_train)
-          model_fit = model.fit()
-          predicted_cases = model_fit.forecast(num_days_validation)
-          mape = MAPE(predicted_cases, split_valid)
-          if mape < min_mape:
+    min_mape = 100
+    for i in range(HOLT_START_DATE - day_range//2, 
+            HOLT_START_DATE + day_range//2):
+        split_train = train_data[param].iloc[i:-num_days_validation].to_numpy() 
+        split_valid = train_data[param].iloc[-num_days_validation:].to_numpy()
+        model = Holt(split_train)
+        model_fit = model.fit()
+        predicted_cases = model_fit.forecast(num_days_validation)
+        mape = MAPE(predicted_cases, split_valid)
+        if mape < min_mape:
             min_mape = mape
-            start_dates[state] = i
-        total_err += len(predicted_cases) * min_mape
+            start_date = i
+    total_err += len(predicted_cases) * min_mape
 
     # TODO: Return individualized state MAPE -- probably go state by state in
     # toplevel method? 
-    return start_dates, total_err/(num_days_validation*50)
+    return start_date, total_err/(num_days_validation)
 
 
-def linreg_start_dates(param, num_days_validation, day_range, states):
+def linreg_start_dates(param, num_days_validation, day_range, start_date, train_data):
     '''Returns the optimal start dates for the Linear Regression simulation.
 
     param: Attribute to optimize (eg. "Deaths")
@@ -90,42 +88,40 @@ def linreg_start_dates(param, num_days_validation, day_range, states):
     '''
     # TODO: Remove state logic, move to toplevel run_all. 
 
-    start_dates = {}
+    optimal_start_date = None
     total_err = 0
-    for state in states:
-        min_mape = 100
-        for i in range(states[state] - day_range//2, states[state] + day_range//2):
-            split = train.loc[train['Province_State'] == state]
-            split_train = split[param].iloc[i:-num_days_validation].to_numpy()
-            split_test = split[param].iloc[-num_days_validation:].to_numpy()
+    min_mape = 100
+    for i in range(start_date - day_range//2, start_date + day_range//2):
+        split_train = train_data[param].iloc[i:-num_days_validation].to_numpy()
+        split_test = train_data[param].iloc[-num_days_validation:].to_numpy()
 
-            x_axis = len(split_train)
-            #x axis is days after april 1st + start_date
-            ids = np.linspace(states[state], x_axis+states[state],x_axis)
-            cal_lin_train_x = ids.reshape(-1,1)
+        x_axis = len(split_train)
+        #x axis is days after april 1st + start_date
+        ids = np.linspace(start_date, x_axis+start_date,x_axis)
+        cal_lin_train_x = ids.reshape(-1,1)
 
-            model = LinearRegression().fit(cal_lin_train_x, split_train)
-            future = np.linspace(0, 
-                    states[state] + x_axis + num_days_validation,
-                    states[state] + x_axis + num_days_validation)
-            cal_lin_test_x = future.reshape(-1,1)
+        model = LinearRegression().fit(cal_lin_train_x, split_train)
+        future = np.linspace(0, 
+                start_date + x_axis + num_days_validation,
+                start_date + x_axis + num_days_validation)
+        cal_lin_test_x = future.reshape(-1,1)
 
-            predicted_y = model.predict(cal_lin_test_x)
-            predicted_cases = predicted_y 
+        predicted_y = model.predict(cal_lin_test_x)
+        predicted_cases = predicted_y 
 
-            mape = MAPE(predicted_cases[-num_days_validation::], split_test)
-            if mape < min_mape:
-                min_mape = mape
-                start_dates[state] = i
-                
-        total_err += len(predicted_cases[-num_days_validation::]) * min_mape
+        mape = MAPE(predicted_cases[-num_days_validation::], split_test)
+        if mape < min_mape:
+            min_mape = mape
+            optimal_start_date = i
+            
+    total_err += len(predicted_cases[-num_days_validation::]) * min_mape
 
     # TODO: Return individualized state MAPE -- probably go state by state in
     # toplevel method? 
-    return start_dates, total_err/(num_days_validation*50)
+    return optimal_start_date, total_err/(num_days_validation)
 
 
-def linreg(param, start_date, state):
+def linreg(param, start_date, train_data):
     '''Perform linear regression over the given state. 
     param: Attribute to optimize (eg. "Deaths").
     start_date: The day to start the linear regression. Days before this point
@@ -134,9 +130,8 @@ def linreg(param, start_date, state):
     '''
     # TODO: states, you know the jam
     
-    split = train.loc[train['Province_State'] == state]
     
-    split_train = split[param].iloc[start_date::].to_numpy()
+    split_train = train_data[param].iloc[start_date::].to_numpy()
     x_axis = len(split_train)
     # x axis is days after april 1st + start_date
     ids = np.linspace(start_date, x_axis+start_date,x_axis)
@@ -158,54 +153,72 @@ def linreg(param, start_date, state):
     pred_data = predicted_cases[-NUM_DAYS_TESTING:]
     return pred_data
 
-def train_arima(param, state, num_days_validation):
+def train_arima(param, num_days_validation, train_data):
     '''
     Do not need any hyperparameters 
     :param: Attribute to train on
-    :state: the US state
     :num_days_validation: the size of validating
     returns the MAPE of the ARIMA
     '''
-    train_arima = train.loc[train['Province_State'] == state][param].values[:-num_days_validation]
-    valid_arima = train.loc[train['Province_State'] == state][param].values[-num_days_validation:]
-    arima_model = auto_arima(split, seasonal=False, supress_warnings = True, start_p = 1, start_q = 0, max_p = 10)
+    train_arima = train_data[param].values[:-num_days_validation]
+    valid_arima = train_data[param].values[-num_days_validation:]
+    arima_model = auto_arima(train_arima, seasonal=False, supress_warnings = True, start_p = 1, start_q = 0, max_p = 10)
     predicted_cases = arima_model.predict(num_days_validation)
     arima_MAPE = MAPE(predicted_cases, valid_arima)
     return arima_MAPE
 
 
-def train_full(param, num_days_validation, start_dates):
+def train_full(param, num_days_validation, train_data):
 
     # TODO: train each state-by-state, implement MAPE comparisons *here*. 
     res = {}
     
-    start_conf = {'Alabama': 170, 'Hawaii': 170, 'Florida' : 170,
-                 'Oklahoma':150, 'Maine': 170, 'Vermont': 170, 'New Hampshire': 170, 'Minnesota': 170, 'Colorado': 170, 'Maryland': 170, 'Missouri':170,
-                 'Nebraska': 170, 'Oklahoma': 170, 'South Carolina': 170, 'South Dakota':170, 'Utah': 170, 'Virginia': 170}
-    start_death = {'Arizona': 170, 'Idaho': 170, 'Wyoming': 170, 'Vermont': 170, 'Maine': 170}
-    lin_states = {}
+    # start_conf = {'Alabama': 170, 'Hawaii': 170, 'Florida' : 170,
+    #              'Oklahoma':150, 'Maine': 170, 'Vermont': 170, 'New Hampshire': 170, 'Minnesota': 170, 'Colorado': 170, 'Maryland': 170, 'Missouri':170,
+    #              'Nebraska': 170, 'Oklahoma': 170, 'South Carolina': 170, 'South Dakota':170, 'Utah': 170, 'Virginia': 170}
+    # start_death = {'Arizona': 170, 'Idaho': 170, 'Wyoming': 170, 'Vermont': 170, 'Maine': 170}
+    # lin_states = {}
 
-    if param == 'Deaths':
-        lin_states = start_death
-    else: 
-        lin_states = start_conf
+    # if param == 'Deaths':
+    #     lin_states = start_death
+    # else: 
+    #     lin_states = start_conf
 
-    # TODO: change up state logic.
-    linreg_start_dates_dict, _ = linreg_start_dates(param, num_days_validation,
-            LINREG_START_DATE_RANGE, lin_states)
+    # # TODO: change up state logic.
+    # linreg_start_dates_dict, _ = linreg_start_dates(param, num_days_validation,
+    #         LINREG_START_DATE_RANGE, lin_states)
     
     for state in np.unique(train['Province_State']):
-        if state in lin_states:
-            res[state] = linreg(param, linreg_start_dates_dict[state], state)
-        else:
-            # Holt Model
-            split = train.loc[train['Province_State'] == state]
-            split_train = split[param].to_numpy()[start_dates[state]:]
-            model = Holt(split_train)
-            model_fit = model.fit()
-            predicted_cases = model_fit.forecast(NUM_DAYS_TESTING)
-            res[state] = predicted_cases
+        data_df = train_data.loc[train['Province_State'] == state]
+        lr_start, lr_mape = linreg_start_dates(param, num_days_validation, LINREG_START_DATE_RANGE, 170, data_df)
+        holt_start, holt_mape = holt_start_dates(param, num_days_validation, HOLT_START_DATE_RANGE, data_df)
+        print("{} MAPE for LR:".format(state), lr_mape)
+        print("{} MAPE for HOLT:".format(state), holt_mape)
+        try:
+            arima_mape = train_arima(param, data_df)
+        except:
+            arima_mape = 1000
+        print("{} MAPE for ARIMA:".format(state), arima_mape)
 
+        min_mape = min(lr_mape, holt_mape, arima_mape)
+        pred_values = []
+        if arima_mape == min_mape:
+            print("{} will use ARIMA".format(state))
+            arima_model = auto_arima(data_df, seasonal=False, supress_warnings = True, start_p = 1, start_q = 0, max_p = 10)
+            pred_values = arima_model.predict(NUM_DAYS_TESTING)
+        elif lr_mape == min_mape:
+            print("{} will use Linear Regression".format(state))
+            print("{} will be the start day".format(lr_start))
+            pred_values = linreg(param, lr_start, data_df)
+        else:
+            print("{} will use Holt".format(state))
+            print("{} will be the start day".format(holt_start))
+            holt_train_data = data_df[param].to_numpy()[holt_start:]
+            model = Holt(holt_train_data)
+            model_fit = model.fit()
+            pred_values = model_fit.forecast(NUM_DAYS_TESTING)
+        print()
+        res[state] = pred_values
     return res
 
 
@@ -222,21 +235,23 @@ if __name__ == "__main__":
 
     # Find optimal training start-dates for our models. 
     # Optimal dates to start training for confirmed and death cases. 
-    conf_start_dates = {}
-    death_start_dates = {}
-    # TODO: record MAPE below
-    death_holt_start_dates, _ = holt_start_dates('Deaths', 
-            NUM_DAYS_VALIDATION,
-            HOLT_START_DATE_RANGE)
-    conf_holt_start_dates, _ = holt_start_dates('Confirmed',
-            NUM_DAYS_VALIDATION,
-            HOLT_START_DATE_RANGE)
+    # conf_start_dates = {}
+    # death_start_dates = {}
+    # # TODO: record MAPE below
+    # death_holt_start_dates, _ = holt_start_dates('Deaths', 
+    #         NUM_DAYS_VALIDATION,
+    #         HOLT_START_DATE_RANGE)
+    # conf_holt_start_dates, _ = holt_start_dates('Confirmed',
+    #         NUM_DAYS_VALIDATION,
+    #         HOLT_START_DATE_RANGE)
 
     # Train the models given the optimized start dates. 
+    print("Training Deaths")
     death_results = train_full('Deaths', 
-            NUM_DAYS_VALIDATION, death_holt_start_dates)
+            NUM_DAYS_VALIDATION, train)
+    print('Training Confirmed')
     conf_results = train_full('Confirmed', 
-            NUM_DAYS_VALIDATION, conf_holt_start_dates)
+            NUM_DAYS_VALIDATION, train)
 
     # TODO: Output to CSV 
 

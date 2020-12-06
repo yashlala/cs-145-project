@@ -1,0 +1,754 @@
+Training Deaths
+Alabama MAPE for LR: 0.4419842037915337
+Alabama MAPE for HOLT: 1.4718003015836236
+Alabama MAPE for ARIMA: 1000
+Alabama will use Linear Regression
+207 will be the start day
+
+Alaska MAPE for LR: 4.730616225501049
+Alaska MAPE for HOLT: 5.696452589576844
+Alaska MAPE for ARIMA: 1000
+Alaska will use Linear Regression
+208 will be the start day
+
+Arizona MAPE for LR: 0.20414234333605702
+Arizona MAPE for HOLT: 0.16390328160174897
+Arizona MAPE for ARIMA: 1000
+Arizona will use Holt
+79 will be the start day
+
+Arkansas MAPE for LR: 0.29702806748216626
+Arkansas MAPE for HOLT: 0.2966563738316845
+Arkansas MAPE for ARIMA: 1000
+Arkansas will use Holt
+79 will be the start day
+
+California MAPE for LR: 0.11931362178137518
+California MAPE for HOLT: 0.1658325611721773
+California MAPE for ARIMA: 1000
+California will use Linear Regression
+217 will be the start day
+
+Colorado MAPE for LR: 0.4409918642131159
+Colorado MAPE for HOLT: 0.41980104730736423
+Colorado MAPE for ARIMA: 1000
+Colorado will use Holt
+8 will be the start day
+
+Connecticut MAPE for LR: 0.3468856992763735
+Connecticut MAPE for HOLT: 0.2864287320650249
+Connecticut MAPE for ARIMA: 1000
+Connecticut will use Holt
+6 will be the start day
+
+Delaware MAPE for LR: 0.21561112770310814
+Delaware MAPE for HOLT: 0.19168315508465988
+Delaware MAPE for ARIMA: 1000
+Delaware will use Holt
+33 will be the start day
+
+Florida MAPE for LR: 0.10829419849775337
+Florida MAPE for HOLT: 0.10743887844767867
+Florida MAPE for ARIMA: 1000
+Florida will use Holt
+78 will be the start day
+
+Georgia MAPE for LR: 0.16143092915224708
+Georgia MAPE for HOLT: 0.6021477700004704
+Georgia MAPE for ARIMA: 1000
+Georgia will use Linear Regression
+217 will be the start day
+
+Hawaii MAPE for LR: 0.3897913870167393
+Hawaii MAPE for HOLT: 3.5606237864547987
+Hawaii MAPE for ARIMA: 1000
+Hawaii will use Linear Regression
+187 will be the start day
+
+Idaho MAPE for LR: 0.3870590515150649
+Idaho MAPE for HOLT: 2.001815494346408
+Idaho MAPE for ARIMA: 1000
+Idaho will use Linear Regression
+207 will be the start day
+
+Illinois MAPE for LR: 0.3003618023195767
+Illinois MAPE for HOLT: 0.2960773558382268
+Illinois MAPE for ARIMA: 1000
+Illinois will use Holt
+21 will be the start day
+
+Indiana MAPE for LR: 0.39345145026768014
+Indiana MAPE for HOLT: 0.4175078238569136
+Indiana MAPE for ARIMA: 1000
+Indiana will use Linear Regression
+218 will be the start day
+
+Iowa MAPE for LR: 0.47356627113319305
+Iowa MAPE for HOLT: 0.6951375607541527
+Iowa MAPE for ARIMA: 1000
+Iowa will use Linear Regression
+217 will be the start day
+
+Kansas MAPE for LR: 0.8971322097189247
+Kansas MAPE for HOLT: 0.6490329072533096
+Kansas MAPE for ARIMA: 1000
+Kansas will use Holt
+69 will be the start day
+
+Kentucky MAPE for LR: 0.4201915872386549
+Kentucky MAPE for HOLT: 0.5055391638476967
+Kentucky MAPE for ARIMA: 1000
+Kentucky will use Linear Regression
+216 will be the start day
+
+Louisiana MAPE for LR: 0.2502408725615606
+Louisiana MAPE for HOLT: 0.26280374933637307
+Louisiana MAPE for ARIMA: 1000
+Louisiana will use Linear Regression
+219 will be the start day
+
+Maine MAPE for LR: 2.4127558460474554
+Maine MAPE for HOLT: 2.31896753904213
+Maine MAPE for ARIMA: 1000
+Maine will use Holt
+44 will be the start day
+
+Maryland MAPE for LR: 0.505229479355175
+Maryland MAPE for HOLT: 0.35301733251374584
+Maryland MAPE for ARIMA: 1000
+Maryland will use Holt
+50 will be the start day
+
+Massachusetts MAPE for LR: 0.05753896877094848
+Massachusetts MAPE for HOLT: 0.06893018763894143
+Massachusetts MAPE for ARIMA: 1000
+Massachusetts will use Linear Regression
+217 will be the start day
+
+Michigan MAPE for LR: 0.47679584870691194
+Michigan MAPE for HOLT: 0.44970851730156625
+Michigan MAPE for ARIMA: 1000
+Michigan will use Holt
+52 will be the start day
+
+Minnesota MAPE for LR: 0.5428738820248427
+Minnesota MAPE for HOLT: 0.779351640920079
+Minnesota MAPE for ARIMA: 1000
+Minnesota will use Linear Regression
+218 will be the start day
+
+Mississippi MAPE for LR: 0.2501564082430138
+Mississippi MAPE for HOLT: 0.39763244628586664
+Mississippi MAPE for ARIMA: 1000
+Mississippi will use Linear Regression
+218 will be the start day
+
+Missouri MAPE for LR: 1.8296960020255486
+Missouri MAPE for HOLT: 1.8791314005246522
+Missouri MAPE for ARIMA: 1000
+Missouri will use Linear Regression
+218 will be the start day
+
+Montana MAPE for LR: 1.5923966142612884
+Montana MAPE for HOLT: 3.8465592451525956
+Montana MAPE for ARIMA: 1000
+Montana will use Linear Regression
+214 will be the start day
+
+Nebraska MAPE for LR: 0.8011270746115543
+Nebraska MAPE for HOLT: 2.2082269055177304
+Nebraska MAPE for ARIMA: 1000
+Nebraska will use Linear Regression
+216 will be the start day
+
+Nevada MAPE for LR: 1.3098135074848698
+Nevada MAPE for HOLT: 1.1633445988642503
+Nevada MAPE for ARIMA: 1000
+Nevada will use Holt
+60 will be the start day
+
+New Hampshire MAPE for LR: 0.14799404336620084
+New Hampshire MAPE for HOLT: 0.14741103643967507
+New Hampshire MAPE for ARIMA: 1000
+New Hampshire will use Holt
+51 will be the start day
+
+New Jersey MAPE for LR: 0.13605093302243995
+New Jersey MAPE for HOLT: 0.10988886686175248
+New Jersey MAPE for ARIMA: 1000
+New Jersey will use Holt
+73 will be the start day
+
+New Mexico MAPE for LR: 1.7768010996462795
+New Mexico MAPE for HOLT: 1.7196088106820224
+New Mexico MAPE for ARIMA: 1000
+New Mexico will use Holt
+39 will be the start day
+
+New York MAPE for LR: 0.034049681798550044
+New York MAPE for HOLT: 0.02783446110993063
+New York MAPE for ARIMA: 1000
+New York will use Holt
+31 will be the start day
+
+North Carolina MAPE for LR: 0.28692361832346186
+North Carolina MAPE for HOLT: 0.3194129163382244
+North Carolina MAPE for ARIMA: 1000
+North Carolina will use Linear Regression
+215 will be the start day
+
+North Dakota MAPE for LR: 0.7457818334592624
+North Dakota MAPE for HOLT: 1.3836647415098224
+North Dakota MAPE for ARIMA: 1000
+North Dakota will use Linear Regression
+205 will be the start day
+
+Ohio MAPE for LR: 0.8692101274709417
+Ohio MAPE for HOLT: 1.21182747369154
+Ohio MAPE for ARIMA: 1000
+Ohio will use Linear Regression
+219 will be the start day
+
+Oklahoma MAPE for LR: 0.20144612632560108
+Oklahoma MAPE for HOLT: 0.2951927815084018
+Oklahoma MAPE for ARIMA: 1000
+Oklahoma will use Linear Regression
+219 will be the start day
+
+Oregon MAPE for LR: 0.851993241623058
+Oregon MAPE for HOLT: 1.323338332547581
+Oregon MAPE for ARIMA: 1000
+Oregon will use Linear Regression
+217 will be the start day
+
+Pennsylvania MAPE for LR: 0.2971383776246567
+Pennsylvania MAPE for HOLT: 0.3035056930195978
+Pennsylvania MAPE for ARIMA: 1000
+Pennsylvania will use Linear Regression
+218 will be the start day
+
+Rhode Island MAPE for LR: 0.5234060540374791
+Rhode Island MAPE for HOLT: 0.6620684058400552
+Rhode Island MAPE for ARIMA: 1000
+Rhode Island will use Linear Regression
+217 will be the start day
+
+South Carolina MAPE for LR: 0.2557911372100883
+South Carolina MAPE for HOLT: 0.307425308051195
+South Carolina MAPE for ARIMA: 1000
+South Carolina will use Linear Regression
+149 will be the start day
+
+South Dakota MAPE for LR: 2.3102533796519205
+South Dakota MAPE for HOLT: 1.9559890587497086
+South Dakota MAPE for ARIMA: 1000
+South Dakota will use Holt
+76 will be the start day
+
+Tennessee MAPE for LR: 0.5026860163949101
+Tennessee MAPE for HOLT: 0.6570474680170838
+Tennessee MAPE for ARIMA: 1000
+Tennessee will use Linear Regression
+216 will be the start day
+
+Texas MAPE for LR: 0.2514648941562095
+Texas MAPE for HOLT: 0.2108677994814395
+Texas MAPE for ARIMA: 1000
+Texas will use Holt
+75 will be the start day
+
+Utah MAPE for LR: 0.580216231847054
+Utah MAPE for HOLT: 0.5479213342496699
+Utah MAPE for ARIMA: 1000
+Utah will use Holt
+67 will be the start day
+
+Vermont MAPE for LR: 0.9805406727048469
+Vermont MAPE for HOLT: 0.8746140439936224
+Vermont MAPE for ARIMA: 1000
+Vermont will use Holt
+16 will be the start day
+
+Virginia MAPE for LR: 0.27215276073135886
+Virginia MAPE for HOLT: 0.21960206962671164
+Virginia MAPE for ARIMA: 1000
+Virginia will use Holt
+1 will be the start day
+
+Washington MAPE for LR: 0.48116832065908544
+Washington MAPE for HOLT: 0.5123525355680502
+Washington MAPE for ARIMA: 1000
+Washington will use Linear Regression
+213 will be the start day
+
+West Virginia MAPE for LR: 0.662459704345007
+West Virginia MAPE for HOLT: 0.6143084493713228
+West Virginia MAPE for ARIMA: 1000
+West Virginia will use Holt
+76 will be the start day
+
+Wisconsin MAPE for LR: 0.7064902935517872
+Wisconsin MAPE for HOLT: 2.2421395911690287
+Wisconsin MAPE for ARIMA: 1000
+Wisconsin will use Linear Regression
+206 will be the start day
+
+Wyoming MAPE for LR: 3.080816693726522
+Wyoming MAPE for HOLT: 2.842395231140594
+Wyoming MAPE for ARIMA: 1000
+Wyoming will use Holt
+31 will be the start day
+
+Training Confirmed
+Alabama MAPE for LR: 0.4296580102262898
+Alabama MAPE for HOLT: 0.1517579859976065
+Alabama MAPE for ARIMA: 1000
+Alabama will use Holt
+20 will be the start day
+
+Alaska MAPE for LR: 0.30553667032351506
+Alaska MAPE for HOLT: 0.7916232560373003
+Alaska MAPE for ARIMA: 1000
+Alaska will use Linear Regression
+213 will be the start day
+
+Arizona MAPE for LR: 1.1732736985786993
+Arizona MAPE for HOLT: 0.08934158850721137
+Arizona MAPE for ARIMA: 1000
+Arizona will use Holt
+78 will be the start day
+
+Arkansas MAPE for LR: 0.4765310177506271
+Arkansas MAPE for HOLT: 0.2826983229362977
+Arkansas MAPE for ARIMA: 1000
+Arkansas will use Holt
+71 will be the start day
+
+California MAPE for LR: 1.4490657729909648
+California MAPE for HOLT: 0.6161530133505838
+California MAPE for ARIMA: 1000
+California will use Holt
+71 will be the start day
+
+Colorado MAPE for LR: 0.7507064627056942
+Colorado MAPE for HOLT: 2.1448367759153375
+Colorado MAPE for ARIMA: 1000
+Colorado will use Linear Regression
+212 will be the start day
+
+Connecticut MAPE for LR: 0.8518530996701601
+Connecticut MAPE for HOLT: 2.173428755014207
+Connecticut MAPE for ARIMA: 1000
+Connecticut will use Linear Regression
+210 will be the start day
+
+Delaware MAPE for LR: 1.9859949260513683
+Delaware MAPE for HOLT: 0.16742508192816055
+Delaware MAPE for ARIMA: 1000
+Delaware will use Holt
+28 will be the start day
+
+Florida MAPE for LR: 0.38737846252819913
+Florida MAPE for HOLT: 0.20895128124731352
+Florida MAPE for ARIMA: 1000
+Florida will use Holt
+75 will be the start day
+
+Georgia MAPE for LR: 0.13724041998512818
+Georgia MAPE for HOLT: 0.4137641327332731
+Georgia MAPE for ARIMA: 1000
+Georgia will use Linear Regression
+189 will be the start day
+
+Hawaii MAPE for LR: 0.07958751900467727
+Hawaii MAPE for HOLT: 0.5485568990987829
+Hawaii MAPE for ARIMA: 1000
+Hawaii will use Linear Regression
+197 will be the start day
+
+Idaho MAPE for LR: 0.33010230095292004
+Idaho MAPE for HOLT: 1.0190884312132826
+Idaho MAPE for ARIMA: 1000
+Idaho will use Linear Regression
+217 will be the start day
+
+Illinois MAPE for LR: 0.2090971049058154
+Illinois MAPE for HOLT: 1.3668314785465192
+Illinois MAPE for ARIMA: 1000
+Illinois will use Linear Regression
+214 will be the start day
+
+Indiana MAPE for LR: 0.6909989571662817
+Indiana MAPE for HOLT: 0.81711743958067
+Indiana MAPE for ARIMA: 1000
+Indiana will use Linear Regression
+213 will be the start day
+
+Iowa MAPE for LR: 0.3541139956606595
+Iowa MAPE for HOLT: 2.3240691425699516
+Iowa MAPE for ARIMA: 1000
+Iowa will use Linear Regression
+216 will be the start day
+
+Kansas MAPE for LR: 1.023758016009413
+Kansas MAPE for HOLT: 0.923039623462368
+Kansas MAPE for ARIMA: 1000
+Kansas will use Holt
+25 will be the start day
+
+Kentucky MAPE for LR: 0.712225776784637
+Kentucky MAPE for HOLT: 0.8687521517024741
+Kentucky MAPE for ARIMA: 1000
+Kentucky will use Linear Regression
+219 will be the start day
+
+Louisiana MAPE for LR: 0.35744128265604674
+Louisiana MAPE for HOLT: 0.8995368548187569
+Louisiana MAPE for ARIMA: 1000
+Louisiana will use Linear Regression
+210 will be the start day
+
+Maine MAPE for LR: 1.3942903448583777
+Maine MAPE for HOLT: 0.44973402386041667
+Maine MAPE for ARIMA: 1000
+Maine will use Holt
+73 will be the start day
+
+Maryland MAPE for LR: 0.8359079583624519
+Maryland MAPE for HOLT: 0.23932186834083438
+Maryland MAPE for ARIMA: 1000
+Maryland will use Holt
+27 will be the start day
+
+Massachusetts MAPE for LR: 0.48703160156520225
+Massachusetts MAPE for HOLT: 0.2962137118089253
+Massachusetts MAPE for ARIMA: 1000
+Massachusetts will use Holt
+49 will be the start day
+
+Michigan MAPE for LR: 0.8500531556056019
+Michigan MAPE for HOLT: 1.952146594962811
+Michigan MAPE for ARIMA: 1000
+Michigan will use Linear Regression
+216 will be the start day
+
+Minnesota MAPE for LR: 0.731288053672482
+Minnesota MAPE for HOLT: 1.1264349137328034
+Minnesota MAPE for ARIMA: 1000
+Minnesota will use Linear Regression
+213 will be the start day
+
+Mississippi MAPE for LR: 0.2513805923022082
+Mississippi MAPE for HOLT: 0.429979468002069
+Mississippi MAPE for ARIMA: 1000
+Mississippi will use Linear Regression
+219 will be the start day
+
+Missouri MAPE for LR: 0.16222358510348106
+Missouri MAPE for HOLT: 0.46600158701113387
+Missouri MAPE for ARIMA: 1000
+Missouri will use Linear Regression
+214 will be the start day
+
+Montana MAPE for LR: 0.4363431613513352
+Montana MAPE for HOLT: 1.8285214646797197
+Montana MAPE for ARIMA: 1000
+Montana will use Linear Regression
+215 will be the start day
+
+Nebraska MAPE for LR: 0.8420746277377471
+Nebraska MAPE for HOLT: 3.2683376128457904
+Nebraska MAPE for ARIMA: 1000
+Nebraska will use Linear Regression
+203 will be the start day
+
+Nevada MAPE for LR: 2.284452539480955
+Nevada MAPE for HOLT: 1.1707305778950727
+Nevada MAPE for ARIMA: 1000
+Nevada will use Holt
+77 will be the start day
+
+New Hampshire MAPE for LR: 0.7923150701916234
+New Hampshire MAPE for HOLT: 1.8718979405430485
+New Hampshire MAPE for ARIMA: 1000
+New Hampshire will use Linear Regression
+219 will be the start day
+
+New Jersey MAPE for LR: 1.030413213458872
+New Jersey MAPE for HOLT: 0.3246450325409797
+New Jersey MAPE for ARIMA: 1000
+New Jersey will use Holt
+64 will be the start day
+
+New Mexico MAPE for LR: 0.75708321131631
+New Mexico MAPE for HOLT: 3.5121890867264702
+New Mexico MAPE for ARIMA: 1000
+New Mexico will use Linear Regression
+218 will be the start day
+
+New York MAPE for LR: 1.0861005182230286
+New York MAPE for HOLT: 0.25250566063584723
+New York MAPE for ARIMA: 1000
+New York will use Holt
+41 will be the start day
+
+North Carolina MAPE for LR: 0.6089553798503246
+North Carolina MAPE for HOLT: 0.32585442927157865
+North Carolina MAPE for ARIMA: 1000
+North Carolina will use Holt
+73 will be the start day
+
+North Dakota MAPE for LR: 0.386245626855881
+North Dakota MAPE for HOLT: 1.2141225760072731
+North Dakota MAPE for ARIMA: 1000
+North Dakota will use Linear Regression
+215 will be the start day
+
+Ohio MAPE for LR: 2.4166891641444104
+Ohio MAPE for HOLT: 0.7524956173794263
+Ohio MAPE for ARIMA: 1000
+Ohio will use Holt
+2 will be the start day
+
+Oklahoma MAPE for LR: 1.5348934460518013
+Oklahoma MAPE for HOLT: 0.9276300309966281
+Oklahoma MAPE for ARIMA: 1000
+Oklahoma will use Holt
+78 will be the start day
+
+Oregon MAPE for LR: 2.1792728278902826
+Oregon MAPE for HOLT: 0.8123010121952071
+Oregon MAPE for ARIMA: 1000
+Oregon will use Holt
+70 will be the start day
+
+Pennsylvania MAPE for LR: 1.4455592521002267
+Pennsylvania MAPE for HOLT: 0.3197023123617763
+Pennsylvania MAPE for ARIMA: 1000
+Pennsylvania will use Holt
+3 will be the start day
+
+Rhode Island MAPE for LR: 0.9962997858565288
+Rhode Island MAPE for HOLT: 1.3620606844357592
+Rhode Island MAPE for ARIMA: 1000
+Rhode Island will use Linear Regression
+215 will be the start day
+
+South Carolina MAPE for LR: 0.3518631263249895
+South Carolina MAPE for HOLT: 0.1961085071377642
+South Carolina MAPE for ARIMA: 1000
+South Carolina will use Holt
+74 will be the start day
+
+South Dakota MAPE for LR: 0.36594442529350096
+South Dakota MAPE for HOLT: 1.4784046129315078
+South Dakota MAPE for ARIMA: 1000
+South Dakota will use Linear Regression
+218 will be the start day
+
+Tennessee MAPE for LR: 0.37326249898791464
+Tennessee MAPE for HOLT: 0.4730343152745688
+Tennessee MAPE for ARIMA: 1000
+Tennessee will use Linear Regression
+204 will be the start day
+
+Texas MAPE for LR: 0.500870227019931
+Texas MAPE for HOLT: 0.2855202197078174
+Texas MAPE for ARIMA: 1000
+Texas will use Holt
+31 will be the start day
+
+Utah MAPE for LR: 0.6431215472140811
+Utah MAPE for HOLT: 1.9292612702545877
+Utah MAPE for ARIMA: 1000
+Utah will use Linear Regression
+219 will be the start day
+
+Vermont MAPE for LR: 1.0696234712697785
+Vermont MAPE for HOLT: 5.848251774230012
+Vermont MAPE for ARIMA: 1000
+Vermont will use Linear Regression
+216 will be the start day
+
+Virginia MAPE for LR: 1.2423935826082584
+Virginia MAPE for HOLT: 0.5630222048496153
+Virginia MAPE for ARIMA: 1000
+Virginia will use Holt
+39 will be the start day
+
+Washington MAPE for LR: 1.9818086466341274
+Washington MAPE for HOLT: 1.920164905458299
+Washington MAPE for ARIMA: 1000
+Washington will use Holt
+6 will be the start day
+
+West Virginia MAPE for LR: 1.3760875041624316
+West Virginia MAPE for HOLT: 0.7704219820763634
+West Virginia MAPE for ARIMA: 1000
+West Virginia will use Holt
+44 will be the start day
+
+Wisconsin MAPE for LR: 0.4933145195965016
+Wisconsin MAPE for HOLT: 1.6414300976019818
+Wisconsin MAPE for ARIMA: 1000
+Wisconsin will use Linear Regression
+201 will be the start day
+
+Wyoming MAPE for LR: 0.7934408098942701
+Wyoming MAPE for HOLT: 3.7054260242070773
+Wyoming MAPE for ARIMA: 1000
+Wyoming will use Linear Regression
+208 will be the start day
+
+Alabama
+MAPE death: 1.3106407535391662
+MAPE conf: 1.0695378496669992
+Alaska
+MAPE death: 3.1036954118427915
+MAPE conf: 1.0771905787380243
+Arizona
+MAPE death: 0.6211269350467629
+MAPE conf: 0.8286123679134089
+Arkansas
+MAPE death: 0.3264545529351601
+MAPE conf: 0.569419205119936
+California
+MAPE death: 0.3834110651329366
+MAPE conf: 0.8471053329604566
+Colorado
+MAPE death: 1.9010615438465415
+MAPE conf: 0.9663603347990676
+Connecticut
+MAPE death: 0.41619563898628614
+MAPE conf: 1.535736444889333
+Delaware
+MAPE death: 0.2901184404238386
+MAPE conf: 0.5992951092370251
+Florida
+MAPE death: 0.3003750220451814
+MAPE conf: 0.4068318088734359
+Georgia
+MAPE death: 0.5005614254978192
+MAPE conf: 0.5383435916699036
+Hawaii
+MAPE death: 1.7394314375012845
+MAPE conf: 0.6077745753671515
+Idaho
+MAPE death: 2.155971074955218
+MAPE conf: 0.43802969291775307
+Illinois
+MAPE death: 0.7573295033710461
+MAPE conf: 1.6115345819580178
+Indiana
+MAPE death: 1.103332609276243
+MAPE conf: 0.8978508421231792
+Iowa
+MAPE death: 1.539877524553165
+MAPE conf: 2.654529473555035
+Kansas
+MAPE death: 2.9206087195650228
+MAPE conf: 2.968802534407739
+Kentucky
+MAPE death: 1.0319113921965595
+MAPE conf: 0.9937456928097937
+Louisiana
+MAPE death: 0.2563232824055683
+MAPE conf: 0.7834050310026843
+Maine
+MAPE death: 5.0181787020306245
+MAPE conf: 1.2890915969690133
+Maryland
+MAPE death: 0.3727249572497071
+MAPE conf: 0.4605337566417784
+Massachusetts
+MAPE death: 0.49024913765641287
+MAPE conf: 1.0434399031652382
+Michigan
+MAPE death: 0.9258688969750253
+MAPE conf: 0.8240825155816787
+Minnesota
+MAPE death: 0.6914646856815787
+MAPE conf: 0.6884834933466343
+Mississippi
+MAPE death: 0.3961546193549417
+MAPE conf: 1.4536151195275135
+Missouri
+MAPE death: 1.6610861175095253
+MAPE conf: 1.7618858365739054
+Montana
+MAPE death: 2.6471271032812025
+MAPE conf: 2.6478261049048704
+Nebraska
+MAPE death: 3.9680920357200984
+MAPE conf: 1.2225053298852566
+Nevada
+MAPE death: 1.5117607026983904
+MAPE conf: 0.3094428064704589
+New Hampshire
+MAPE death: 2.037189528422794
+MAPE conf: 3.633134284309616
+New Jersey
+MAPE death: 0.19948670804975388
+MAPE conf: 0.3314821488633609
+New Mexico
+MAPE death: 0.7420669763048211
+MAPE conf: 2.7901061037390322
+New York
+MAPE death: 0.1697856395731906
+MAPE conf: 0.3650936196239319
+North Carolina
+MAPE death: 0.48347647642284175
+MAPE conf: 0.32721405587302127
+North Dakota
+MAPE death: 2.340971240823932
+MAPE conf: 3.1355631281791507
+Ohio
+MAPE death: 1.1372455681361873
+MAPE conf: 0.6704461187981209
+Oklahoma
+MAPE death: 1.2041113560592256
+MAPE conf: 1.1545106178481743
+Oregon
+MAPE death: 2.4463269592756878
+MAPE conf: 2.038504576966012
+Pennsylvania
+MAPE death: 1.1121420518047243
+MAPE conf: 0.9895107735360146
+Rhode Island
+MAPE death: 0.9899530719991047
+MAPE conf: 1.9716576680198366
+South Carolina
+MAPE death: 0.46563196947414576
+MAPE conf: 0.3368160961979582
+South Dakota
+MAPE death: 2.070638633330884
+MAPE conf: 0.5184899943609862
+Tennessee
+MAPE death: 1.6458517288347156
+MAPE conf: 1.4753807318611434
+Texas
+MAPE death: 0.4988648504215068
+MAPE conf: 0.7126601245778531
+Utah
+MAPE death: 0.41419814463961374
+MAPE conf: 0.6276426644330514
+Vermont
+MAPE death: 3.1540374070775186
+MAPE conf: 2.1839912161686237
+Virginia
+MAPE death: 0.5693680515909322
+MAPE conf: 0.27867919078356634
+Washington
+MAPE death: 1.9857053044522788
+MAPE conf: 0.41514743036668206
+West Virginia
+MAPE death: 1.1997744530979413
+MAPE conf: 0.31473011930227635
+Wisconsin
+MAPE death: 1.3771667065455466
+MAPE conf: 3.031476293512305
+Wyoming
+MAPE death: 5.891576017989899
+MAPE conf: 3.4453216522356382
+TOTAL conf mape: 1.2368514024126327
+TOTAL death mape: 1.409534042712107
