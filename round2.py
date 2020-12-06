@@ -157,7 +157,11 @@ def linreg(param, start_date, state):
     pred_data = predicted_cases[-NUM_DAYS_TESTING:]
     return pred_data
 
-def train_full(param, t_size, start_dates_conf_holt, start_dates_death_holt):
+
+
+def train_full(param, num_days_validation, start_dates):
+
+    # TODO: train each state-by-state, implement MAPE comparisons *here*. 
     res = {}
     
     start_conf = {'Hawaii': 80, 'Wyoming': 170, 'Arizona': 170, 'Alaska':170, 'Florida' : 170,
@@ -170,26 +174,24 @@ def train_full(param, t_size, start_dates_conf_holt, start_dates_death_holt):
     else: 
         lin_states = start_conf
 
-    opt_lin_start = {}
-    linreg_start_dates(param, t_size, LIN_REG_RANGE, opt_lin_start, lin_states)
-
+    # TODO: change up state logic.
+    linreg_start_dates_dict = linreg_start_dates(param, num_days_validation,
+            LINREG_START_DATE_RANGE, lin_states)
     
     for state in np.unique(train['Province_State']):
-        
         if state in lin_states:
-            res[state] = linreg(param, opt_lin_start[state], state)
+            res[state] = linreg(param, linreg_start_dates_dict[state], state)
         else:
             # Holt Model
             split = train.loc[train['Province_State'] == state]
-            if param == 'Deaths':
-                split_train = split[param].to_numpy()[start_dates_death_holt[state]:]
-            else:
-                split_train = split[param].to_numpy()[start_dates_conf_holt[state]:] 
+            split_train = split[param].to_numpy()[start_dates[state]:]
             model = Holt(split_train)
             model_fit = model.fit()
             predicted_cases = model_fit.forecast(NUM_DAYS_TESTING)
             res[state] = predicted_cases
+
     return res
+
 
 if __name__ == "__main__":
     # Ignore matrix warnings, etc. 
