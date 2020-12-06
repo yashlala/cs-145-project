@@ -1,13 +1,19 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.linear_model import LinearRegression
 import sklearn.metrics
 from sklearn.preprocessing import PolynomialFeatures
 from statsmodels.tsa.api import ExponentialSmoothing, SimpleExpSmoothing, Holt
 from warnings import simplefilter
 from statsmodels.tools.sm_exceptions import ConvergenceWarning
+
+# Hyperparameters
+
+# The number of days to test. 
+# eg. All but the last 7 days are trained on, the last 7 days will be reserved
+# for testing data. 
+NUM_DAYS_TESTING = 7
 
 LIN_REG_RANGE = 50
 HOLT_RANGE = 40
@@ -24,16 +30,16 @@ def MAPE(predicted, actual):
 
 def get_opt_toy(param, t_size, day_range, opt_split):
     total_err = 0
-    for state in np.unique(train2['Province_State']):
-        split = train2.loc[train2['Province_State'] == state]
+    for state in np.unique(train['Province_State']):
+        split = train.loc[train['Province_State'] == state]
         min_mape = 100
         for i in range(40 - day_range, 41 + day_range):
           split_train = split[param].iloc[i:-t_size].to_numpy() # why start at 40? should this be tuned?
-          split_test = split[param].iloc[-t_size:].to_numpy()
+          split_valid = split[param].iloc[-t_size:].to_numpy()
           model = Holt(split_train)
           model_fit = model.fit()
           predicted_cases = model_fit.forecast(t_size)
-          mape = MAPE(predicted_cases, split_test)
+          mape = MAPE(predicted_cases, split_valid)
           if mape < min_mape:
             min_mape = mape
             opt_split[state] = i
@@ -45,7 +51,7 @@ def linreg_opt_start(param, t_size, day_range, opt_starts, states):
     for state in states:
         min_mape = 100
         for i in range(states[state] - day_range, states[state] + day_range):
-            split = train2.loc[train2['Province_State'] == state]
+            split = train.loc[train['Province_State'] == state]
             split_train = split[param].iloc[i:-t_size].to_numpy()
             split_test = split[param].iloc[-t_size:].to_numpy()
 
@@ -70,7 +76,7 @@ def linreg_opt_start(param, t_size, day_range, opt_starts, states):
     return total_err/(t_size*50)
 
 def linreg(param, start_date, state):
-    split = train2.loc[train2['Province_State'] == state]
+    split = train.loc[train['Province_State'] == state]
     
     split_train = split[param].iloc[start_date::].to_numpy()
     x_axis = len(split_train)
@@ -87,7 +93,7 @@ def linreg(param, start_date, state):
     pred_data = predicted_cases[-7:]
     return pred_data
 
-def train_full(param, opt_conf_start_holt, opt_death_start_holt):
+def train_full(param, t_size, start_dates_conf_holt, start_dates_death_holt):
     res = {}
     
     start_conf = {'Hawaii': 80, 'Wyoming': 170, 'Arizona': 170, 'Alaska':170, 'Florida' : 170,
@@ -101,53 +107,54 @@ def train_full(param, opt_conf_start_holt, opt_death_start_holt):
         lin_states = start_conf
 
     opt_lin_start = {}
-    linreg_opt_start(param, T_SIZE, LIN_REG_RANGE, opt_lin_start, lin_states)
+    linreg_opt_start(param, t_size, LIN_REG_RANGE, opt_lin_start, lin_states)
 
     
-    for state in np.unique(train2['Province_State']):
+    for state in np.unique(train['Province_State']):
         
         if state in lin_states:
             res[state] = linreg(param, opt_lin_start[state], state)
         else:
             # Holt Model
-            split = train2.loc[train2['Province_State'] == state]
+            split = train.loc[train['Province_State'] == state]
             if param == 'Deaths':
-                split_train = split[param].to_numpy()[opt_death_start_holt[state]:]
+                split_train = split[param].to_numpy()[start_dates_death_holt[state]:]
             else:
-                split_train = split[param].to_numpy()[opt_conf_start_holt[state]:] 
+                split_train = split[param].to_numpy()[start_dates_conf_holt[state]:] 
             model = Holt(split_train)
             model_fit = model.fit()
-            predicted_cases = model_fit.forecast(7)
+            predicted_cases = model_fit.forecast(NUM_DAYS_TESTING)
             res[state] = predicted_cases
     return res
 
 if __name__ == "__main__":
+    # Ignore matrix warnings, etc. 
     simplefilter(action='ignore', category=FutureWarning)
     simplefilter('ignore', ConvergenceWarning)
 
+    # Segregate the training and testing data
+    train = pd.read_csv('./data/train_full.csv')
+    test = train[-NUM_DAYS_TESTING * 50:]
+    train = train[:-NUM_DAYS_TESTING * 50]
 
-    opt_conf_start = {}
-    opt_death_start = {}
-    train2 = pd.read_csv('./data/train_full.csv')
-    train2_test = train2[-350:]
-    train2 = train2[:-350]
+    # Find optimal training start-dates for our models. 
+    # Optimal dates to start training for confirmed and death cases. 
+    conf_start_dates_conf = {}
+    death_start_dates_death = {}
+    pure_holt = get_opt_toy('Deaths', T_SIZE, HOLT_RANGE, start_dates_death)
+    pure_d_holt = get_opt_toy('Confirmed', T_SIZE, HOLT_RANGE, start_dates_conf)
 
-    print("Finding optimal start dates for holt")
-    pure_holt = get_opt_toy('Deaths', T_SIZE, HOLT_RANGE, opt_death_start)
-    print("Got optimal start dates for deaths")
-    pure_d_holt = get_opt_toy('Confirmed', T_SIZE, HOLT_RANGE, opt_conf_start)
-    print('Got holt optimal start dates')
+    # Train the models given the optimized start dates. 
+    conf_results = train_full('Confirmed', T_SIZE, start_dates_conf, start_dates_death)
+    death_results = train_full('Deaths', T_SIZE, start_dates_conf, start_dates_death)
 
+    # TODO: Output to CSV 
 
-    print("Beginning to train")
-    conf_results = train_full('Confirmed', opt_conf_start, opt_death_start)
-    print("Finished training on confirmed")
-    death_results = train_full('Deaths', opt_conf_start, opt_death_start)
-
+    # Print results
     conf_mape = 0
     death_mape = 0
-    for state in np.unique(train2_test['Province_State']):
-        actual_df = train2_test.loc[train2_test['Province_State'] == state]
+    for state in np.unique(test['Province_State']):
+        actual_df = test.loc[test['Province_State'] == state]
         actual_c = actual_df['Confirmed'].to_numpy()
         actual_d = actual_df['Deaths'].to_numpy()
         state_d = MAPE(death_results[state], actual_d)
@@ -161,8 +168,3 @@ if __name__ == "__main__":
     death_mape /= 50
     print('TOTAL conf mape:', conf_mape)
     print('TOTAL death mape:', death_mape)
-
-
-
-
-
