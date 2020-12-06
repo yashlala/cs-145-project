@@ -158,11 +158,20 @@ def linreg(param, start_date, state):
     pred_data = predicted_cases[-NUM_DAYS_TESTING:]
     return pred_data
 
-def train_arima(param, state):
-    split = train2.loc[train2['Province_State'] == state][param].values
+def train_arima(param, state, num_days_validation):
+    '''
+    Do not need any hyperparameters 
+    :param: Attribute to train on
+    :state: the US state
+    :num_days_validation: the size of validating
+    returns the MAPE of the ARIMA
+    '''
+    train_arima = train.loc[train['Province_State'] == state][param].values[:-num_days_validation]
+    valid_arima = train.loc[train['Province_State'] == state][param].values[-num_days_validation:]
     arima_model = auto_arima(split, seasonal=False, supress_warnings = True, start_p = 1, start_q = 0, max_p = 10)
-    predicted_cases = arima_model.predict(7)
-    return predicted_cases
+    predicted_cases = arima_model.predict(num_days_validation)
+    arima_MAPE = MAPE(predicted_cases, valid_arima)
+    return arima_MAPE
 
 
 def train_full(param, num_days_validation, start_dates):
