@@ -125,21 +125,36 @@ def linreg_start_dates(param, num_days_validation, day_range, states):
 
 
 def linreg(param, start_date, state):
+    '''Perform linear regression over the given state. 
+    param: Attribute to optimize (eg. "Deaths").
+    start_date: The day to start the linear regression. Days before this point
+        will not be trained on. 
+    state: The state data to regress over.
+    '''
+    # TODO: states, you know the jam
+    
     split = train.loc[train['Province_State'] == state]
     
     split_train = split[param].iloc[start_date::].to_numpy()
     x_axis = len(split_train)
-    #x axis is days after april 1st + start_date
+    # x axis is days after april 1st + start_date
     ids = np.linspace(start_date, x_axis+start_date,x_axis)
-    cal_lin_train_x = ids.reshape(-1,1)
+    cal_lin_train_x = ids.reshape(-1, 1)
 
     model = LinearRegression().fit(cal_lin_train_x, split_train)
-    future = np.linspace(0,start_date + x_axis+7,start_date+x_axis+7)
-    cal_lin_test_x = future.reshape(-1,1)
+    # TODO: We use NUM_DAYS_TESTING because we want to "predict" 7 days. This
+    # works when we want to "predict" our test dataset, but will FAIL if we use
+    # this method to check our validation dataset (eg. "is linear or holt
+    # better?"). We'll want to consolidate these later, but for now mind the
+    # gap. 
+    future = np.linspace(0, 
+            start_date + x_axis + NUM_DAYS_TESTING, 
+            start_date + x_axis + NUM_DAYS_TESTING)
+    cal_lin_test_x = future.reshape(-1, 1)
 
     predicted_cases = model.predict(cal_lin_test_x)
 
-    pred_data = predicted_cases[-7:]
+    pred_data = predicted_cases[-NUM_DAYS_TESTING:]
     return pred_data
 
 def train_full(param, t_size, start_dates_conf_holt, start_dates_death_holt):
