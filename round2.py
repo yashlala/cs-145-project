@@ -73,8 +73,6 @@ def holt_start_dates(param, num_days_validation, day_range, train_data):
             start_date = i
     total_err += len(predicted_cases) * min_mape
 
-    # TODO: Return individualized state MAPE -- probably go state by state in
-    # toplevel method? 
     return start_date, total_err/(num_days_validation)
 
 
@@ -87,7 +85,6 @@ def linreg_start_dates(param, num_days_validation, day_range, start_date, train_
     states: hardcoded dictionary of which states to predict over with linear
     regression. 
     '''
-    # TODO: Remove state logic, move to toplevel run_all. 
 
     optimal_start_date = None
     total_err = 0
@@ -97,7 +94,7 @@ def linreg_start_dates(param, num_days_validation, day_range, start_date, train_
         split_test = train_data[param].iloc[-num_days_validation:].to_numpy()
 
         x_axis = len(split_train)
-        #x axis is days after april 1st + start_date
+        # x axis is days after april 1st + start_date
         ids = np.linspace(start_date, x_axis+start_date,x_axis)
         cal_lin_train_x = ids.reshape(-1,1)
 
@@ -117,8 +114,6 @@ def linreg_start_dates(param, num_days_validation, day_range, start_date, train_
             
     total_err += len(predicted_cases[-num_days_validation::]) * min_mape
 
-    # TODO: Return individualized state MAPE -- probably go state by state in
-    # toplevel method? 
     return optimal_start_date, total_err/(num_days_validation)
 
 
@@ -129,8 +124,6 @@ def linreg(param, start_date, train_data):
         will not be trained on. 
     state: The state data to regress over.
     '''
-    # TODO: states, you know the jam
-    
     
     split_train = train_data[param].iloc[start_date::].to_numpy()
     x_axis = len(split_train)
@@ -161,33 +154,20 @@ def train_arima(param, num_days_validation, train_data):
     :num_days_validation: the size of validating
     returns the MAPE of the ARIMA
     '''
-    train_arima = train_data[param].values[:-num_days_validation]
-    valid_arima = train_data[param].values[-num_days_validation:]
-    arima_model = auto_arima(train_arima, seasonal=False, supress_warnings = True, start_p = 1, start_q = 0, max_p = 10)
+    train = train_data[param].values[:-num_days_validation]
+    validation = train_data[param].values[-num_days_validation:]
+
+    arima_model = auto_arima(train, seasonal=False, 
+            supress_warnings=True, start_p=1, start_q=0, max_p=10)
     predicted_cases = arima_model.predict(num_days_validation)
-    arima_MAPE = MAPE(predicted_cases, valid_arima)
+    arima_MAPE = MAPE(predicted_cases, validation)
     return arima_MAPE
 
 
 def train_full(param, num_days_validation, train_data):
 
-    # TODO: train each state-by-state, implement MAPE comparisons *here*. 
     res = {}
     
-    # start_conf = {'Alabama': 170, 'Hawaii': 170, 'Florida' : 170,
-    #              'Oklahoma':150, 'Maine': 170, 'Vermont': 170, 'New Hampshire': 170, 'Minnesota': 170, 'Colorado': 170, 'Maryland': 170, 'Missouri':170,
-    #              'Nebraska': 170, 'Oklahoma': 170, 'South Carolina': 170, 'South Dakota':170, 'Utah': 170, 'Virginia': 170}
-    # start_death = {'Arizona': 170, 'Idaho': 170, 'Wyoming': 170, 'Vermont': 170, 'Maine': 170}
-    # lin_states = {}
-
-    # if param == 'Deaths':
-    #     lin_states = start_death
-    # else: 
-    #     lin_states = start_conf
-
-    # # TODO: change up state logic.
-    # linreg_start_dates_dict, _ = linreg_start_dates(param, num_days_validation,
-    #         LINREG_START_DATE_RANGE, lin_states)
     
     for state in np.unique(train['Province_State']):
         data_df = train_data.loc[train['Province_State'] == state]
@@ -234,18 +214,6 @@ if __name__ == "__main__":
     train = pd.read_csv('./data/train_full.csv')
     test = train[-NUM_DAYS_TESTING * 50:]
     train = train[:-NUM_DAYS_TESTING * 50]
-
-    # Find optimal training start-dates for our models. 
-    # Optimal dates to start training for confirmed and death cases. 
-    # conf_start_dates = {}
-    # death_start_dates = {}
-    # # TODO: record MAPE below
-    # death_holt_start_dates, _ = holt_start_dates('Deaths', 
-    #         NUM_DAYS_VALIDATION,
-    #         HOLT_START_DATE_RANGE)
-    # conf_holt_start_dates, _ = holt_start_dates('Confirmed',
-    #         NUM_DAYS_VALIDATION,
-    #         HOLT_START_DATE_RANGE)
 
     # Train the models given the optimized start dates. 
     print("Training Deaths")
