@@ -16,7 +16,7 @@ from pmdarima import auto_arima
 # The number of days to test on. 
 # eg. All but the last 7 days are trained on, the last 7 days will be reserved
 # for testing data. 
-NUM_DAYS_TESTING = 7
+NUM_DAYS_PREDICTING = 8
 
 # The number of days to validate on. 
 # eg. All but the last 7 days are trained on, the last 7 days will be reserved
@@ -120,19 +120,19 @@ def linreg(param, start_date, train_data):
     cal_lin_train_x = ids.reshape(-1, 1)
 
     model = LinearRegression().fit(cal_lin_train_x, split_train)
-    # TODO: We use NUM_DAYS_TESTING because we want to "predict" 7 days. This
+    # TODO: We use NUM_DAYS_PREDICTING because we want to "predict" 7 days. This
     # works when we want to "predict" our test dataset, but will FAIL if we use
     # this method to check our validation dataset (eg. "is linear or holt
     # better?"). We'll want to consolidate these later, but for now mind the
     # gap. 
     future = np.linspace(0, 
-            start_date + x_axis + NUM_DAYS_TESTING, 
-            start_date + x_axis + NUM_DAYS_TESTING)
+            start_date + x_axis + NUM_DAYS_PREDICTING, 
+            start_date + x_axis + NUM_DAYS_PREDICTING)
     cal_lin_test_x = future.reshape(-1, 1)
 
     predicted_cases = model.predict(cal_lin_test_x)
 
-    return predicted_cases[-NUM_DAYS_TESTING:]
+    return predicted_cases[-NUM_DAYS_PREDICTING:]
 
 def train_arima(param, num_days_validation, train_data):
     '''
@@ -160,7 +160,7 @@ def train_full(param, num_days_validation, train_data):
         holt_start, holt_mape = holt_start_dates(param, num_days_validation, data_df)
         print("{} MAPE for LR:".format(state), lr_mape)
         print("{} MAPE for HOLT:".format(state), holt_mape)
-        arima_mape = train_arima(param, NUM_DAYS_VALIDATION, data_df)
+        arima_mape = train_arima(param, num_days_validation, data_df)
         print("{} MAPE for ARIMA:".format(state), arima_mape)
 
         min_mape = min(lr_mape, holt_mape, arima_mape)
@@ -171,7 +171,7 @@ def train_full(param, num_days_validation, train_data):
             arima_model = auto_arima(arima_train, seasonal=False,
                     supress_warnings=True, start_p=1, start_q=0, 
                     max_p=10)
-            pred_values = arima_model.predict(NUM_DAYS_TESTING)
+            pred_values = arima_model.predict(NUM_DAYS_PREDICTING)
         elif lr_mape == min_mape:
             print("{} will use Linear Regression".format(state))
             print("{} will be the start day".format(lr_start))
@@ -182,7 +182,7 @@ def train_full(param, num_days_validation, train_data):
             holt_train_data = data_df[param].to_numpy()[holt_start:]
             model = Holt(holt_train_data)
             model_fit = model.fit()
-            pred_values = model_fit.forecast(NUM_DAYS_TESTING)
+            pred_values = model_fit.forecast(NUM_DAYS_PREDICTING)
         print()
         res[state] = pred_values
     return res
@@ -196,8 +196,6 @@ if __name__ == "__main__":
 
     # Segregate the training and testing data
     train = pd.read_csv('./data/train_full.csv')
-    test = train[-NUM_DAYS_TESTING * 50:]
-    train = train[:-NUM_DAYS_TESTING * 50]
 
     # Train the models. 
     print("Training Deaths")
@@ -207,24 +205,11 @@ if __name__ == "__main__":
     conf_results = train_full('Confirmed', 
             NUM_DAYS_VALIDATION, train)
 
-    # Print results
-    conf_mape = 0
-    death_mape = 0
-    for state in np.unique(test['Province_State']):
-        actual_df = test.loc[test['Province_State'] == state]
-        actual_c = actual_df['Confirmed'].to_numpy()
-        actual_d = actual_df['Deaths'].to_numpy()
-        state_d = MAPE(death_results[state], actual_d)
-        state_c = MAPE(conf_results[state], actual_c)
-        print(state)
-        print("MAPE death:", state_d)
-        print("MAPE conf:", state_c)
-        death_mape += state_d
-        conf_mape += state_c
-    conf_mape /= 50
-    death_mape /= 50
-    print('TOTAL conf mape:', conf_mape)
-    print('TOTAL death mape:', death_mape)
+    # Remove the first day of result data. 
+    for state, res in death_results: 
+        death_results[state] = res[1:]
+    for state, res in conf_results: 
+        conf_results[state] = res[1:]
 
     # Output to CSV 
     test = pd.read_csv('./data/test_round2.csv')
@@ -245,4 +230,3 @@ if __name__ == "__main__":
     submission = test
     submission = submission.drop(['Province_State', 'Date'], axis = 1)
     submission.to_csv('./data/round2.csv', index=False)
-
