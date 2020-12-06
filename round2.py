@@ -169,8 +169,8 @@ def train_full(param, num_days_validation, train_data):
             print("{} will use ARIMA".format(state))
             arima_train = data_df[param].to_numpy()
             arima_model = auto_arima(arima_train, seasonal=False,
-                    supress_warnings = True, start_p = 1, start_q = 0, max_p
-                    = 10)
+                    supress_warnings=True, start_p=1, start_q=0, 
+                    max_p=10)
             pred_values = arima_model.predict(NUM_DAYS_TESTING)
         elif lr_mape == min_mape:
             print("{} will use Linear Regression".format(state))
@@ -207,7 +207,25 @@ if __name__ == "__main__":
     conf_results = train_full('Confirmed', 
             NUM_DAYS_VALIDATION, train)
 
-    # TODO: Output to CSV 
+    # Output to CSV 
+    test = pd.read_csv('./data/test_round2.csv')
+    test['Confirmed'] = test['Confirmed'].astype(float)
+    test['Deaths'] = test['Deaths'].astype(float)
+    # Save confirmed cases. 
+    for index, state in enumerate(np.unique(train['Province_State'])):
+        predicted_cases = conf_results[state]
+        for j in range(len(predicted_cases)):
+            cur_index = index + j * 50
+            test.at[cur_index, 'Confirmed'] = predicted_cases[j]
+    # Save deaths. 
+    for index, state in enumerate(np.unique(train['Province_State'])):
+        predicted_cases = death_results[state]
+        for j in range(len(predicted_cases)):
+            cur_index = index + j * 50
+            test.at[cur_index, 'Deaths'] = predicted_cases[j]
+    submission = test
+    submission = submission.drop(['Province_State', 'Date'], axis = 1)
+    submission.to_csv('./data/round2.csv', index=False)
 
     # Print results
     conf_mape = 0
