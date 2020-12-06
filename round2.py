@@ -21,6 +21,7 @@ NUM_DAYS_TESTING = 7
 # The number of days to validate on. 
 # eg. All but the last 7 days are trained on, the last 7 days will be reserved
 # for validateing data. 
+# TODO: tune this guy to make it smaller 
 NUM_DAYS_VALIDATION = 7
 
 # Models are validated with different "training start dates". 
@@ -194,17 +195,18 @@ def train_full(param, num_days_validation, train_data):
         holt_start, holt_mape = holt_start_dates(param, num_days_validation, HOLT_START_DATE_RANGE, data_df)
         print("{} MAPE for LR:".format(state), lr_mape)
         print("{} MAPE for HOLT:".format(state), holt_mape)
-        try:
-            arima_mape = train_arima(param, data_df)
-        except:
-            arima_mape = 1000
+        # try:
+        arima_mape = train_arima(param, NUM_DAYS_VALIDATION, data_df)
+        # except:
+        #     arima_mape = 1000
         print("{} MAPE for ARIMA:".format(state), arima_mape)
 
         min_mape = min(lr_mape, holt_mape, arima_mape)
         pred_values = []
         if arima_mape == min_mape:
             print("{} will use ARIMA".format(state))
-            arima_model = auto_arima(data_df, seasonal=False, supress_warnings = True, start_p = 1, start_q = 0, max_p = 10)
+            arima_train = data_df[param].to_numpy()
+            arima_model = auto_arima(arima_train, seasonal=False, supress_warnings = True, start_p = 1, start_q = 0, max_p = 10)
             pred_values = arima_model.predict(NUM_DAYS_TESTING)
         elif lr_mape == min_mape:
             print("{} will use Linear Regression".format(state))

@@ -148,4 +148,3 @@ dependencies:
     - requests==2.25.0
     - statsmodels==0.12.1
     - urllib3==1.26.2
-prefix: /Users/hamlinliu/opt/miniconda3/envs/covid19
