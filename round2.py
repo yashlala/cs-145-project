@@ -207,6 +207,25 @@ if __name__ == "__main__":
     conf_results = train_full('Confirmed', 
             NUM_DAYS_VALIDATION, train)
 
+    # Print results
+    conf_mape = 0
+    death_mape = 0
+    for state in np.unique(test['Province_State']):
+        actual_df = test.loc[test['Province_State'] == state]
+        actual_c = actual_df['Confirmed'].to_numpy()
+        actual_d = actual_df['Deaths'].to_numpy()
+        state_d = MAPE(death_results[state], actual_d)
+        state_c = MAPE(conf_results[state], actual_c)
+        print(state)
+        print("MAPE death:", state_d)
+        print("MAPE conf:", state_c)
+        death_mape += state_d
+        conf_mape += state_c
+    conf_mape /= 50
+    death_mape /= 50
+    print('TOTAL conf mape:', conf_mape)
+    print('TOTAL death mape:', death_mape)
+
     # Output to CSV 
     test = pd.read_csv('./data/test_round2.csv')
     test['Confirmed'] = test['Confirmed'].astype(float)
@@ -227,21 +246,3 @@ if __name__ == "__main__":
     submission = submission.drop(['Province_State', 'Date'], axis = 1)
     submission.to_csv('./data/round2.csv', index=False)
 
-    # Print results
-    conf_mape = 0
-    death_mape = 0
-    for state in np.unique(test['Province_State']):
-        actual_df = test.loc[test['Province_State'] == state]
-        actual_c = actual_df['Confirmed'].to_numpy()
-        actual_d = actual_df['Deaths'].to_numpy()
-        state_d = MAPE(death_results[state], actual_d)
-        state_c = MAPE(conf_results[state], actual_c)
-        print(state)
-        print("MAPE death:", state_d)
-        print("MAPE conf:", state_c)
-        death_mape += state_d
-        conf_mape += state_c
-    conf_mape /= 50
-    death_mape /= 50
-    print('TOTAL conf mape:', conf_mape)
-    print('TOTAL death mape:', death_mape)
