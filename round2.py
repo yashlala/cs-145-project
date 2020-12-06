@@ -25,17 +25,11 @@ NUM_DAYS_TESTING = 7
 NUM_DAYS_VALIDATION = 7
 
 # Models are validated with different "training start dates". 
-# These values determine the middle of the range of starting dates to check
-# over. 
-# 
-# TODO: triple check this logic, switch to a "start date" and a "end date"
-HOLT_START_DATE = 40
-LINREG_START_DATE = 170
-
-# These values determine the range of days to check over. 
-# TODO: triple check as above. 
-HOLT_START_DATE_RANGE = 80
-LINREG_START_DATE_RANGE = 100
+# These values determine the beginnings and endings of the dates to check over. 
+HOLT_START_DATE = 0
+HOLT_END_DATE = 80
+LINREG_START_DATE = 120
+LINREG_END_DATE = 220
 
 train = None
 
@@ -60,8 +54,7 @@ def holt_start_dates(param, num_days_validation, train_data):
     start_date = None
     total_err = 0
     min_mape = 100
-    for i in range(HOLT_START_DATE - HOLT_START_DATE_RANGE//2, 
-            HOLT_START_DATE + HOLT_START_DATE_RANGE//2):
+    for i in range(HOLT_START_DATE, HOLT_END_DATE):
         split_train = train_data[param].iloc[i:-num_days_validation].to_numpy() 
         split_valid = train_data[param].iloc[-num_days_validation:].to_numpy()
         model = Holt(split_train)
@@ -89,23 +82,16 @@ def linreg_start_dates(param, num_days_validation, train_data):
     optimal_start_date = None
     total_err = 0
     min_mape = 100
-    for i in range(LINREG_START_DATE - LINREG_START_DATE_RANGE//2, 
-            LINREG_START_DATE + LINREG_START_DATE_RANGE//2):
-        split_train = train_data[param].iloc[i:-num_days_validation].to_numpy()
-        split_test = train_data[param].iloc[-num_days_validation:].to_numpy()
+    for i in range(LINREG_START_DATE, LINREG_END_DATE): 
+        split_train = train_data[param].iloc[i:-NUM_DAYS_VALIDATION].to_numpy()
+        split_test = train_data[param].iloc[-NUM_DAYS_VALIDATION:].to_numpy()
 
         x_axis = len(split_train)
-        # x axis is days after april 1st + start_date
-        ids = np.linspace(LINREG_START_DATE, 
-                x_axis + LINREG_START_DATE, x_axis)
-        cal_lin_train_x = ids.reshape(-1,1)
+        cal_lin_train_x = np.linspace(0, x_axis, x_axis).reshape(-1, 1)
+        cal_lin_test_x = np.linspace(0, x_axis + num_days_validation, 
+                x_axis + num_days_validation).reshape(-1, 1)
 
         model = LinearRegression().fit(cal_lin_train_x, split_train)
-        future = np.linspace(0, 
-                LINREG_START_DATE + x_axis + num_days_validation,
-                LINREG_START_DATE + x_axis + num_days_validation)
-        cal_lin_test_x = future.reshape(-1,1)
-
         predicted_y = model.predict(cal_lin_test_x)
         predicted_cases = predicted_y 
 
