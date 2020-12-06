@@ -46,25 +46,36 @@ def MAPE(predicted, actual):
         res += diff
     return (res/len(predicted)) * 100
 
-def get_opt_toy(param, t_size, day_range, opt_split):
+
+def holt_start_dates(param, num_days_validation, day_range):
+    '''Returns the optimal start dates for the HOLT simulation
+
+    param: Attribute to optimize (eg. "Deaths")
+    num_days_validation: How many days to validate on. 
+    day_range: The number of days to train over
+    '''
+
+    opt_split = {}
     total_err = 0
     for state in np.unique(train['Province_State']):
         split = train.loc[train['Province_State'] == state]
         min_mape = 100
-        for i in range(40 - day_range, 41 + day_range):
-          split_train = split[param].iloc[i:-t_size].to_numpy() # why start at 40? should this be tuned?
-          split_valid = split[param].iloc[-t_size:].to_numpy()
+        for i in range(HOLT_START_DATE - day_range//2, 
+                HOLT_START_DATE + day_range//2):
+          split_train = split[param].iloc[i:-num_days_validation].to_numpy() # why start at 40? should this be tuned?
+          split_valid = split[param].iloc[-num_days_validation:].to_numpy()
           model = Holt(split_train)
           model_fit = model.fit()
-          predicted_cases = model_fit.forecast(t_size)
+          predicted_cases = model_fit.forecast(num_days_validation)
           mape = MAPE(predicted_cases, split_valid)
           if mape < min_mape:
             min_mape = mape
             opt_split[state] = i
         total_err += len(predicted_cases) * min_mape
-    return total_err/(t_size*50)
+    return total_err/(num_days_validation*50)
 
-def linreg_opt_start(param, t_size, day_range, opt_starts, states):
+
+def linreg_start_dates(param, t_size, day_range, opt_starts, states):
     total_err = 0
     for state in states:
         min_mape = 100
@@ -125,7 +136,7 @@ def train_full(param, t_size, start_dates_conf_holt, start_dates_death_holt):
         lin_states = start_conf
 
     opt_lin_start = {}
-    linreg_opt_start(param, t_size, LIN_REG_RANGE, opt_lin_start, lin_states)
+    linreg_start_dates(param, t_size, LIN_REG_RANGE, opt_lin_start, lin_states)
 
     
     for state in np.unique(train['Province_State']):
