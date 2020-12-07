@@ -50,6 +50,8 @@ predictions will be stored in `./round2.csv`.
 
 ## Files
 
+- /README.md
+  - You are here. 
 - /environment.yml
   - This file describes the conda environment necessary to run our code. 
 - /data
