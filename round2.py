@@ -20,8 +20,7 @@ NUM_DAYS_PREDICTING = 8
 
 # The number of days to validate on. 
 # eg. All but the last 7 days are trained on, the last 7 days will be reserved
-# for validateing data. 
-# TODO: tune this guy to make it smaller 
+# for validating data. 
 NUM_DAYS_VALIDATION = 3
 
 # Models are validated with different "training start dates". 
@@ -31,7 +30,10 @@ HOLT_END_DATE = 80
 LINREG_START_DATE = 120
 LINREG_END_DATE = 220
 
-EPSILON = 0.15 # small epsilon value
+# When HOLT and linear regression give us similar values, we want to choose
+# HOLT (because it works nicer for exponential data). This variable controls
+# the "tolerance" (in terms of MAPE) for that difference. 
+EPSILON = 0.05 
 
 train = None
 
@@ -169,6 +171,8 @@ def train_full(param, num_days_validation, train_data):
         print("{} MAPE for ARIMA:".format(state), arima_mape)
 
         min_mape = min(lr_mape, holt_mape, arima_mape)
+        # If HOLT and linear regression are similar, prefer HOLT. It
+        # generalizes better (especially when we're missing data). 
         if abs(lr_mape - holt_mape) <= EPSILON:
             min_mape = holt_mape
         pred_values = []
