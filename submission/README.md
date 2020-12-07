@@ -39,6 +39,9 @@ More useful information about managing environments can be found
 You may also quickly review the usage of basic Python and Numpy package, if
 needed in grading our assignment.
 
+If you run into a problem when installing, please uninstall and reinstall
+NumPy. 
+
 ---
 
 To generate our predictions for Part 1, run `python round1.py`. The resulting
