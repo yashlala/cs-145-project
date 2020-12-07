@@ -206,9 +206,9 @@ if __name__ == "__main__":
             NUM_DAYS_VALIDATION, train)
 
     # Remove the first day of result data. 
-    for state, res in death_results: 
+    for state, res in death_results.items(): 
         death_results[state] = res[1:]
-    for state, res in conf_results: 
+    for state, res in conf_results.items(): 
         conf_results[state] = res[1:]
 
     # Output to CSV 
