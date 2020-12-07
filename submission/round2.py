@@ -240,4 +240,4 @@ if __name__ == "__main__":
             test.at[cur_index, 'Deaths'] = predicted_cases[j]
     submission = test
     submission = submission.drop(['Province_State', 'Date'], axis = 1)
-    submission.to_csv('./data/round2.csv', index=False)
+    submission.to_csv('./round2.csv', index=False)

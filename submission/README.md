@@ -66,9 +66,11 @@ predictions will be stored in `./round2.csv`.
     - round1 + round 2 training data as well as data scraped from JHU CSSE
       covid repo (https://github.com/CSSEGISandData/COVID-19)
   - round1.csv 
-    - our predictions for round 1.
+    - our pregenerated predictions for round 1. You can produce a new version
+      by running round1.py!
   - round2.csv 
-    - our predictions for round 2. Should be identical to `/Team22.csv`.
+    - our pregenerated predictions for round 2. It should be identical to
+      Team22.csv.  You can produce a new version by running round2.py!
 - /round1.py
   - Code needed to create round 1 predictions
 - /round2.py
