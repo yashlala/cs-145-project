@@ -22,7 +22,7 @@ NUM_DAYS_TESTING = 7
 # eg. All but the last 7 days are trained on, the last 7 days will be reserved
 # for validateing data. 
 # TODO: tune this guy to make it smaller 
-NUM_DAYS_VALIDATION = 7
+NUM_DAYS_VALIDATION = 3
 
 # Models are validated with different "training start dates". 
 # These values determine the beginnings and endings of the dates to check over. 
@@ -30,6 +30,8 @@ HOLT_START_DATE = 0
 HOLT_END_DATE = 80
 LINREG_START_DATE = 120
 LINREG_END_DATE = 220
+
+EPSILON = 0.15 # small epsilon value
 
 train = None
 
@@ -160,10 +162,17 @@ def train_full(param, num_days_validation, train_data):
         holt_start, holt_mape = holt_start_dates(param, num_days_validation, data_df)
         print("{} MAPE for LR:".format(state), lr_mape)
         print("{} MAPE for HOLT:".format(state), holt_mape)
-        arima_mape = train_arima(param, NUM_DAYS_VALIDATION, data_df)
+        try:
+            arima_mape = train_arima(param, NUM_DAYS_VALIDATION, data_df)
+        except:
+            arima_mape = 1000
         print("{} MAPE for ARIMA:".format(state), arima_mape)
 
+        
+
         min_mape = min(lr_mape, holt_mape, arima_mape)
+        if abs(lr_mape - holt_mape) <= EPSILON:
+            min_mape = holt_mape
         pred_values = []
         if arima_mape == min_mape:
             print("{} will use ARIMA".format(state))
