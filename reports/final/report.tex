@@ -43,6 +43,74 @@ TODO
 
 \maketitle
 
+\section{Introduction}
+
+\section{Model Performance}
+\subsection{Linear Regression}
+\subsection{ARIMA}
+\subsection{HOLT}
+\subsection{Conclusions}
+
+While the HOLT model typically gives us the lowest overall MAPE, it
+consistently underperforms on certain states. Linear Regression and ARIMA may
+yield significantly better results for these "problem states". However, it is
+not always easy to tell which states are going to cause problems with the HOLT
+model -- performance varies significantly based on the shape of the latest
+batch of test data. This heterogeneity makes it very difficult to pick a
+"favored model" for our time series predictions. 
+
+Not all of our results were mixed. While model performance varied significantly
+based on the target state, the "optimal hyperparameters" used to train these
+models do not change significantly on a state-by-state basis. By performing
+grid search on each model's hyperparameters, we developed a group of
+parameterized models that handle general state data reasonably well. 
+
+
+\section{Model Design}
+
+The pros and cons (as well as the relative efficacy) of each model have already
+been discussed. Faced with such a diversity of model performance, we opted to
+use a hybrid model for our overall submission. Rather than cherry picking the
+best-performing models for each state, we opted to use an automated approach. 
+
+Suppose we have to predict $m$ days into the future. 
+
+Our model first segregates the data by state. For each state,
+
+\section{TODO TODO TODO TODO}
+% did I mention this is TODO?
+
+First, we segregate the data. Given $n$ days of training data, our model uses
+the first $n-2$ days to train on (we'll call this set $T$) and the last $2$
+days as a validation dataset (we'll call this subdivision $V$). 
+We then train Linear Regression, HOLT, and ARIMA models on $T$, predicting
+$m+2$ days into the future. We take the first $2$ days of these predictions,
+and calculate the MAPE using $V$. After comparing the MAPEs of each model on
+$V$, we choose the model that gives us the lowest MAPE for that particular
+state, and return the remaining $m$ days of predictions. 
+
+After observing our hybrid model, we noted two trends: 
+\begin{itemize}
+\item 
+Splitting our data into $T$ and $V$ caused some of our models to
+underperform. This is because they effectively had to predict $m+2$ days into
+the future as opposed to $m$ days (the first two days, of course, were used for
+our validation and model selection). This underperformance wasn't uniform;
+HOLT tended to give us relatively accurate predictions, while linear regression
+tended to underpredict the number of deaths. 
+\item
+Different models often give similar MAPEs when evaluated on $V$. 
+\end{itemize}
+
+Given these two points, we added an $\epsilon$ "margin" term to our final
+implementation. If two models perform comparatively (ie. within $\epsilon$ MAPE
+of each other) on $V$, then our framework prefers the model that "generalizes
+better" as per our heuristic observations. For example, if linear regression
+and HOLT both get an MAPE of $8.675309 \pm (\epsilon = 0.001)$, our framework
+will use HOLT to predict the values for the state. Our framework prefers HOLT
+to linear regression if the MAPEs are similar, but doesn't put ARIMA into this
+"margin" framework (ie. if ARIMA yields the lowest MAPE, ARIMA will always be
+chosen). 
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{report}
