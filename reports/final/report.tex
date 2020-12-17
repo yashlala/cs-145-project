@@ -199,21 +199,43 @@ Therefore, we used the Holt Winters Exponential Smoothing model which takes tren
 
 \section{Future Plans}
 
-From here on out, we shall focus on decreasing the MAPE score either using different methods of prediction or by continually extracting features from our current data or obtaining new types of data within the April - August timeframe.
+From here on out, we shall focus on decreasing the MAPE score either using
+different methods of prediction or by continually extracting features from our
+current data or obtaining new types of data within the April - August
+timeframe.
 
 \subsection{Preprocessing}
 
-On the data processing side, we also want to consider the utilization of binning Province\_State values by similarity measures of their Confirmed case profiles, and work toward integrating the supplemental graph data, namely the use of the latitude and longitude to establish a physical distance, as well as the inflow and outflow to cluster states of similar behaviors. We hope that these efforts would do well to combat potential overfitting to training data within a state and would encourage a more robust model that can generalize well to different data.
+On the data processing side, we also want to consider the utilization of
+binning Province\_State values by similarity measures of their Confirmed case
+profiles, and work toward integrating the supplemental graph data, namely the
+use of the latitude and longitude to establish a physical distance, as well as
+the inflow and outflow to cluster states of similar behaviors. We hope that
+these efforts would do well to combat potential overfitting to training data
+within a state and would encourage a more robust model that can generalize well
+to different data.
 
 \subsection{Recurrent Neural Networks}
-Our group has also been flirting with the idea of utilizing RNN methods to help with our forecasting efforts. In pursuing this domain, we will open up the potential for many more problems with our model architecture and to ensure correctness of training and implementation, as well as tuning hyperparameters. We would also need to get the whole group up to speed, which may not be worth the trouble for something we can’t ensure the success of. We would most likely employ the use of other methods within the scikit-learn module to integrate this architecture to our project.
+
+Our group has also been flirting with the idea of utilizing RNN methods to help
+with our forecasting efforts. In pursuing this domain, we will open up the
+potential for many more problems with our model architecture and to ensure
+correctness of training and implementation, as well as tuning hyperparameters.
+We would also need to get the whole group up to speed, which may not be worth
+the trouble for something we can’t ensure the success of. We would most likely
+employ the use of other methods within the scikit-learn module to integrate
+this architecture to our project.
  
-It also remains to determine the best method of prediction, as we had initially misinterpreted the data we would be given for testing – as we now know that we will only be supplied the Province\_State of interest and the date to be forecasted. This implies that we will most likely be looking into methods in which we \emph{a priori} predict functions for each state (or some cluster of similar states) that predicts cases given the date.
+It also remains to determine the best method of prediction, as we had initially
+misinterpreted the data we would be given for testing – as we now know that we
+will only be supplied the Province\_State of interest and the date to be
+forecasted. This implies that we will most likely be looking into methods in
+which we \emph{a priori} predict functions for each state (or some cluster of
+similar states) that predicts cases given the date.
 
 
 \bibliographystyle{ACM-Reference-Format}
-\bibliography{test}
+\bibliography{report}
+
 \end{document}
 \endinput
-%%
-%% End of file `sample-sigconf.tex'.
