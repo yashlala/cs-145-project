@@ -70,22 +70,24 @@ to predict the number of cases and deaths for a particular state.
 
 \subsection{Related Work}
 
-Notable advances in this domain are noted, Nesteruk \cite{Nesteruk} employs the
-Susceptible, Infected, Removed (SIR) paradigm – which aims to find different
-correlated differential equations to model flow between different partitions of
-the studied population – and the subsequent progression of the pandemic. Yonar
-\cite{EJMO} uses different more direct curve estimation methods on the number
-of coronavirus cases, such as Holt and ARIMA, for different affected countries
-of interest, (e.g. Germany, Japan, Turkey, UK, .etc), which are shown to be
-statistically significant. Different iterative methods, based on cubic spline
-interpolation and Euler's methods are more novel developments in pursuit of
-accurately representing the spread of the virus \cite{APPADU2020}.
+Notable advances in this domain are noted. Nesteruk \cite{Nesteruk} models the
+progression of the pandemic using the Susceptible, Infected, Removed (SIR)
+paradigm, which aims to find correlated differential equations to model flow
+between different partitions of the studied population. 
+\cite{EJMO} uses more direct curve estimation methods such as Holt and ARIMA on
+the number of coronavirus cases in of interest, (e.g. Germany, Japan, Turkey,
+the UK, etc.). These models predict the actual number of coronavirus cases to a
+high degree of statistical significance. 
+Others have applied novel iterative methods based on cubic spline interpolation
+and Euler's methods towards predicting the spread of the virus \cite{APPADU2020}.
 
 \section{Data Preprocessing}
 
 Now moving on to actually wrangling the data for processing and straightforward
 input to our prospective models, we first needed to examine the existing data
-to analyze where help was needed. Upon inspection of data types, it is noted
+to analyze where help was needed. 
+
+Upon inspection of data types, it is noted
 that much of our data is numerical, bar the categorical and ordinal columns of
 Province\_State and Date, respectively. We chose to convert the date from a
 string type to datetime object type, to ease future parsing. Using our
@@ -135,34 +137,30 @@ models to drop the null values from the training dataset.
 
 \section{Problem Definition}
 
-%% TODO: might be a bit too long and too detailed 
-%% not sure what to edit so I just wrote a lot (easier to cut than to write more)
-
-Currently with surging cases and deaths, the medical infrastructure in the
-United States cannot keep up. They cannot prepare for these pandemic surges and
-thus would need to find a way to predict when they will happen. Thus, the
-problem set to be solved in these experiments is to create a method utilizing
-the foundations and skills learned from CS 145 at UCLA to predict the cases in
-each state of the United States for a given amount of time. 
-
-%%TODO: cite the dataset
+We are given a dataset of various COVID-related features (eg. testing rate,
+deaths, confirmed cases), as well as a dataset of various movement-related data
+(traffic flow into and out of two states, respectively). 
+We must train a machine learning model on this data, and use it to predict the
+future rates of death and confirmed cases of COVID-19. 
 
 The competition is divided into 2 rounds. The first round was to predict the
 case and death count of each of the 50 states from September 1st to September
 26th given any COVID-19 related data from April 12th to August 31st. The second
 round was to predict the case and death count of each of the 50 states during
-the winter holiday surge, specifically from December 7th to December 12th. For
+the winter holiday surge, specifically from December 7th to December 12th. 
+For
 the second round, the method can train on any any COVID-19 related data from
 April 12th to December 6th. 
 
-The accuracy of the prediction will be evaluated with the mean absolute
-percentage error (MAPE) which averages the absolute error on all data points.
-Equation is given below.
+Our model's accuracy will be gauged via the Mean Absolute Percentage Error
+(MAPE) metric, which is defined as the average of the absolute error over all
+data points as per the equation below. 
 
 $$MAPE = \frac{1}{n} \sum_{i = 1}^{n} |\frac{p_i - a_i}{a_i} |$$
 
-$n$ symbolizes the size of the dataset. $p_i$ symbolizes the predicted value at
-index $i$. $a_i$ symbolizes the actual value at index $i$.
+$n$ is defined as the size of the dataset. $p_i$ symbolizes the predicted value
+of a feature at index $i$. $a_i$ symbolizes the actual value of the feature at
+index $i$.
 
 
 \section{Model Performance}
