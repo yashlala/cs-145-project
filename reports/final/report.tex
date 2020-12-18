@@ -138,7 +138,12 @@ only went up to November 22nd. To do this, we created a simple Python web scrape
 would download the new daily files from the Johns Hopkins University CSSE COVID-19 
 dataset \cite{JHUdataset} which updates everyday with a new comma-separated-values file.
 Thus we were able to obtain the confirmed COVID-19 case and death count of each state
-within the US up to December 5th, 2020.
+within the US up to December 5th, 2020. The addition of data points nearer to our test 
+interval (December 7th to December 13th) allows us to better determine the local trend 
+of both confirmed and death cases, which is significant for our regression models, more 
+specifically, our simple linear extrapolated model. It is good to note, however, that this may 
+introduce overfitting to observed patterns very close to the testing interval, 
+which we attempted to mitigate by giving precedent to our alternative models.
 
 
 \section{Problem Definition}
@@ -154,11 +159,13 @@ case and death count of each of the 50 states from September 1st to September
 26th given any COVID-19 related data from April 12th to August 31st. The second
 round was to predict the case and death count of each of the 50 states during
 the winter holiday surge, specifically from December 7th to December 12th. 
-For
-the second round, the method can train on any any COVID-19 related data from
+For the second round, the method can train on any any COVID-19 related data from
 April 12th to December 6th. 
 
-Our model's accuracy will be gauged via the Mean Absolute Percentage Error
+The goal of the problem is to create a machine learning model that produces
+the most accurate predictions for the goal dates of round 1 and round 2
+given the allowed training data for both rounds.
+Our model's accuracy will be evaluated via the Mean Absolute Percentage Error
 (MAPE) metric, which is defined as the average of the absolute error over all
 data points as per the equation below. 
 
@@ -167,6 +174,7 @@ $$MAPE = \frac{1}{n} \sum_{i = 1}^{n} |\frac{p_i - a_i}{a_i} |$$
 $n$ is defined as the size of the dataset. $p_i$ symbolizes the predicted value
 of a feature at index $i$. $a_i$ symbolizes the actual value of the feature at
 index $i$.
+
 
 
 \section{Model Performance}
