@@ -371,6 +371,30 @@ Given the lackluster results, amount of time required to tune each parameter,
 and the non-deterministic nature of neural networks, the use of LSTM neural
 networks was not really explored deeply with the rest of the dataset.
 
+\subsection{Other Methods}
+
+In addition to the specific models, we also tested some other time-series
+specific methods using the AtsPy software library \cite{atspy}. This software
+package contains Python implementations of the Prophet, Gluonts, and TBATS methods 
+that were easily to be trained using the data that had been split into training
+and validation datasets.
+
+Prophet is a procedure used by the Facebook Data Science team for their time 
+series forecasting \cite{Prophet}. It was very complicated and convoluted to 
+use and the MAPE results that it gave on the validation set was not feasible 
+for us to use as our main method of forecasting.
+
+Gluonts is an RNN based framework for time series forecasting \cite{Gluonts}. It uses
+probabilistic modeling in order to predict and forecast future time-series
+data. Again, the MAPE results were very poor and its complexit was not worth
+the amount of time that we had.
+
+TBATS is a method that uses something called a Box-Cox transformations to 
+forecast future time series data points \cite{TBATS}. The MAPE results it yielded from
+a simple validation on the last week of data were too  poor to necessitate 
+further research and its complexity further hindered it.
+
+
 \subsection{Conclusions}
 
 While the HOLT model typically gives us the lowest overall MAPE, it
@@ -392,6 +416,7 @@ based on the target state, the "optimal hyperparameters" used to train these
 models do not change significantly on a state-by-state basis. By performing
 grid search on each model's hyperparameters, we developed a group of
 parameterized models that handle general state data reasonably well. 
+
 
 
 \section{Final Model Design}
