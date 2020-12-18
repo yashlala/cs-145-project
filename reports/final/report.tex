@@ -80,7 +80,9 @@ high degree of statistical significance.
 Others have applied novel iterative methods based on cubic spline interpolation
 and Euler's methods towards predicting the spread of the virus \cite{APPADU2020}.
 
+
 \section{Data Preprocessing}
+
 Now moving on to actually wrangling the data for processing and straightforward
 input to our prospective models, we first needed to examine the existing data
 to analyze where help was needed. 
@@ -100,6 +102,7 @@ general thought that most people would be sheltering in place, and thus would
 not travel between states.
 
 \subsection{Round 1}
+
 Our initial imputation strategy went as follows: We examined each state’s
 numeric data column by column. If null values comprised more than 70\% of the
 total data in the column, we dropped the entire column; otherwise, we replaced
@@ -139,6 +142,7 @@ within the US up to December 5th, 2020.
 
 
 \section{Problem Definition}
+
 We are given a dataset of various COVID-related features (eg. testing rate,
 deaths, confirmed cases), as well as a dataset of various movement-related data
 (traffic flow into and out of two states, respectively). 
@@ -166,79 +170,147 @@ index $i$.
 
 
 \section{Model Performance}
+
 \subsection{Linear Regression}
-The very first model we tried was Linear Regression. Linear Regression tries to fit a best fit linear line through our data by minimizing the sum of squares between the outputted line and our data points\cite{scikit-learn}. With this type of model we would be able to predict cases based on the average increase in cases over time. This approach alone would not produce good results on its own for multiple reasons. One is that the increasing amount of confirmed cases and deaths are not linear clearly seen in Figure \ref{fig:linreg}. Another is that linear regression is affected greatly by the lag period of low cases in many states as the virus first began to spread. To combat this we chose many different start dates that were after the lag period for many different states. The results were much better this way. This approach did very well predicting our test data for some states, not as much for others. In our midterm report we wrote that we decided not to go ahead with this approach as we believed we could not go further than beating the baseline. However we later came back to linear regression and used it for the particular states that it performed well on, and compared this to our other models like Holt. This included states like Hawaii, Arizona, Oklahoma, Wyoming, and Vermont. We decided to use this model for some states on our Kaggle submission and again on our final submission. 
+
+The very first model we tried was Linear Regression. Linear Regression tries to
+fit a best fit linear line through our data by minimizing the sum of squares
+between the outputted line and our data points\cite{scikit-learn}. With this
+type of model we would be able to predict cases based on the average increase
+in cases over time. This approach alone would not produce good results on its
+own for multiple reasons. One is that the increasing amount of confirmed cases
+and deaths are not linear clearly seen in Figure \ref{fig:linreg}. Another is
+that linear regression is affected greatly by the lag period of low cases in
+many states as the virus first began to spread. To combat this we chose many
+different start dates that were after the lag period for many different states.
+The results were much better this way. This approach did very well predicting
+our test data for some states, not as much for others. In our midterm report we
+wrote that we decided not to go ahead with this approach as we believed we
+could not go further than beating the baseline. However we later came back to
+linear regression and used it for the particular states that it performed well
+on, and compared this to our other models like Holt. This included states like
+Hawaii, Arizona, Oklahoma, Wyoming, and Vermont. We decided to use this model
+for some states on our Kaggle submission and again on our final submission. 
+
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{figures/7-linear-reg.png}
-  \caption{Example of Linear Regression: $x$ is the numbers of days past our start date of April 1st, $y$ is the fitted line of confirmed cases for Arizona}
+  \caption{Example of Linear Regression: $x$ is the numbers of days past our
+  start date of April 1st, $y$ is the fitted line of confirmed cases for
+  Arizona}
   \label{fig:linreg}
 \end{figure}
+
 \subsection{Polynomial Fitting}
-To try and mimic the exponential increase that linear regression couldn't do, we chose to try a polynomial fitting approach. Polynomial fitting tries to best fit a line through our data points of degree N. So our hope is that the line continuing past our training data would better reflect the trend a particular state is showing. We used the scikit-learn package to transform our input to work with the degree N we want to fit\cite{scikit-learn}. This approach worked great at fitting our training data points. It also did a very good job at predicting the next few days for many states. We got best results with fitting a line of degree 3 and 5. We ended up deciding we would not go forward with it. We decided this because when it tries to fit the training data, the trend a few days after the end can either shoot upwards exponentially or begin to dip downward, where the number of predicted cases or deaths is actually lower than the previous day. We see this happening in Figure \ref{fig:polyfit} for the state of Arizona with a degree of 3. We thought we could mitigate this by predicting a few days ahead and then refitting until we had our full prediction. The big downfall of this approach is that it would compound any error we produced with our predictions to every other prediction made afterwards.
+
+To try and mimic the exponential increase that linear regression couldn't do,
+we chose to try a polynomial fitting approach. Polynomial fitting tries to best
+fit a line through our data points of degree N. So our hope is that the line
+continuing past our training data would better reflect the trend a particular
+state is showing. We used the scikit-learn package to transform our input to
+work with the degree N we want to fit\cite{scikit-learn}. This approach worked
+great at fitting our training data points. It also did a very good job at
+predicting the next few days for many states. We got best results with fitting
+a line of degree 3 and 5. We ended up deciding we would not go forward with it.
+We decided this because when it tries to fit the training data, the trend a few
+days after the end can either shoot upwards exponentially or begin to dip
+downward, where the number of predicted cases or deaths is actually lower than
+the previous day. We see this happening in Figure \ref{fig:polyfit} for the
+state of Arizona with a degree of 3. We thought we could mitigate this by
+predicting a few days ahead and then refitting until we had our full
+prediction. The big downfall of this approach is that it would compound any
+error we produced with our predictions to every other prediction made
+afterwards.
+
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{figures/7-poly-fit.png}
-  \caption{Example of Polynomial Fitting: $x$ is the numbers of days past our start date of April 1st, $y$ is the fitted line of confirmed cases for Arizona}
+  \caption{Example of Polynomial Fitting: $x$ is the numbers of days past our
+  start date of April 1st, $y$ is the fitted line of confirmed cases for
+  Arizona}
   \label{fig:polyfit}
 \end{figure}
 
 \subsection{ARIMA}
+
 Given the issue of producing predictions of confirmed cases and deaths without
-having access to the values of the other features we would want to include in 
-our model for the predicting time period. It was clear that time series algorithms
-would be the best class of models for our data. The first model tried was the
-Autoregressive (AR) model. The AR model uses a linear combination of previous
-time steps to predict the future time steps. The equation for this model is \cite{forecasting},
+having access to the values of the other features we would want to include in
+our model for the predicting time period. It was clear that time series
+algorithms would be the best class of models for our data. The first model
+tried was the Autoregressive (AR) model. The AR model uses a linear combination
+of previous time steps to predict the future time steps. The equation for this
+model is \cite{forecasting},
+
 \begin{equation}
  y_t = c + \phi_1 y_{t-1} + \phi_2 y_{t-2} + ... + \phi_p y_{t-p} + \epsilon_t 
 \end{equation}
-Where $y_t$ denotes the number of cases at time $t$, $\phi_j$ are the learned weights,
- $\epsilon_t$ is white noise and $c$ is a bias term. In this case we are looking at the last $p$ time days
-for prediction, we denote this as an AR(p) model. 
 
-To implement the model we use the 'AutoReg' module from the statsmodels package \cite{statsmodels}
-and trained a unique AR model for each state. Since this model
-was mainly explored during round 1, we used the data from the 2nd of August 2020 to the 31st of August 2020
-as validation data. From this validation data we tuned $p$ to get the lowest overall mape for confirmed cases and deaths.
-This led to an optimal $p$ of 3, however, our MAPE was still very high at $11.3$. What we saw in the model was that our
-confirmed cases diverged significantly from the true values as time went on. When the AR model predicts future unseen values,
-we have shown that the model must use previous time steps to predict the current one. Hence when looking at unseen data, 
-the model will use previously predicted values to predict future values. This leads to a compounding of error and thus 
-results in a diverging relationship between the true values and the predicted ones as can be seen in figure \ref{fig:AR}.
+Where $y_t$ denotes the number of cases at time $t$, $\phi_j$ are the learned
+weights, $\epsilon_t$ is white noise and $c$ is a bias term. In this case we
+are looking at the last $p$ time days for prediction, we denote this as an
+AR(p) model. 
+
+To implement the model we use the 'AutoReg' module from the statsmodels package
+\cite{statsmodels} and trained a unique AR model for each state. Since this
+model was mainly explored during round 1, we used the data from the 2nd of
+August 2020 to the 31st of August 2020 as validation data. From this validation
+data we tuned $p$ to get the lowest overall mape for confirmed cases and
+deaths. This led to an optimal $p$ of 3, however, our MAPE was still very high
+at $11.3$. What we saw in the model was that our confirmed cases diverged
+significantly from the true values as time went on. When the AR model predicts
+future unseen values, we have shown that the model must use previous time steps
+to predict the current one. Hence when looking at unseen data, the model will
+use previously predicted values to predict future values. This leads to a
+compounding of error and thus results in a diverging relationship between the
+true values and the predicted ones as can be seen in figure \ref{fig:AR}.
+
 \begin{figure}
   \includegraphics[width=\linewidth]{./figures/Section2_AR_Cali_Conf.png}
   \caption{Confirmed Cases in California predicted using AR}
   \label{fig:AR}
 \end{figure} 
-Our final round 1 MAPE using AR was $4.12$
-The issue with our implementation of the model is that we did not enforce the stationarity of the data which 
-is a prerequisite for the model. A stationary time series is one whose properties do not depend on the time at 
-which the series is observed \cite{forecasting}.
-This therefore shows AR's difficulty in accounting for the trend since stationary
-data is devoid of one. Therefore we needed a model that was able to account for data with a trend. This is why we chose to 
-explore the Autoregressive Integrated Moving Average (ARIMA) model. The Moving Average (MA) portion of ARIMA states that 
-future time steps are predicted as a linear combination of previous forecast errors. The equation for this model is \cite{forecasting},
+
+Our final round 1 MAPE using AR was $4.12$ The issue with our implementation of
+the model is that we did not enforce the stationarity of the data which is a
+prerequisite for the model. A stationary time series is one whose properties do
+not depend on the time at which the series is observed \cite{forecasting}. This
+therefore shows AR's difficulty in accounting for the trend since stationary
+data is devoid of one. Therefore we needed a model that was able to account for
+data with a trend. This is why we chose to explore the Autoregressive
+Integrated Moving Average (ARIMA) model. The Moving Average (MA) portion of
+ARIMA states that future time steps are predicted as a linear combination of
+previous forecast errors. The equation for this model is \cite{forecasting},
+
 \begin{equation}
 y_t = c + \sum_{i=1}^{q} \theta_i \epsilon_{t-i}
 \end{equation} 
-Where $\theta_i$ are the learned weights, $c$ is the bias term and $\epsilon_i$ are the white noise error terms that are 
-seen in equation 1. Since we look at the last $q$ time steps, this is known as a MA(q) model.
-Hence, a combination of the AR model and the MA model will reduce the compounding error problem from before since we
-take the forecast errors into account. However both AR and MA models require data to be stationary which as shown before is not
-the case. A way to make data stationary is by looking at the difference of contiguous time series values $y'_t = y_t - y_{t-1}$
-as opposed to the values themselves. This process of differencing can be done multiple times if the initial differencing does
-not yield a stationary time series.
 
-Therefore, the ARIMA model incorporates differencing to give the forecasting equation \cite{forecasting},
+Where $\theta_i$ are the learned weights, $c$ is the bias term and $\epsilon_i$
+are the white noise error terms that are seen in equation 1. Since we look at
+the last $q$ time steps, this is known as a MA(q) model. Hence, a combination
+of the AR model and the MA model will reduce the compounding error problem from
+before since we take the forecast errors into account. However both AR and MA
+models require data to be stationary which as shown before is not the case. A
+way to make data stationary is by looking at the difference of contiguous time
+series values $y'_t = y_t - y_{t-1}$ as opposed to the values themselves. This
+process of differencing can be done multiple times if the initial differencing
+does not yield a stationary time series.
+
+Therefore, the ARIMA model incorporates differencing to give the forecasting
+equation \cite{forecasting},
+
 \begin{equation}
-  y'_t = c + \sum_{i = 1}^{p} \phi_i y'_{t-i} + \sum_{j=1}^{q} \theta_j \epsilon_{t-j} + \epsilon_t
+y'_t = c + \sum_{i = 1}^{p} \phi_i y'_{t-i} 
++ \sum_{j=1}^{q} \theta_j \epsilon_{t-j} + \epsilon_t
 \end{equation}
-Which we see is a combination of equations 1 and 2 but on differenced values. Thus the $\epsilon_j$ are white noise errors for
-$y'_j$ not the original time series $y_j$. As we mentioned, differencing can occur many times until stationarity is enforced,
-we let the the number of time the data is differenced be denoted as $d$ the degree of differencing. Furthermore, we are
-already aware of the parameters $p$ and $q$ from the respective AR and MA models. Hence we denote the above equation as an
-ARIMA(p,d,q) model. 
+
+Which we see is a combination of equations 1 and 2 but on differenced values.
+Thus the $\epsilon_j$ are white noise errors for $y'_j$ not the original time
+series $y_j$. As we mentioned, differencing can occur many times until
+stationarity is enforced, we let the the number of time the data is differenced
+be denoted as $d$ the degree of differencing. Furthermore, we are already aware
+of the parameters $p$ and $q$ from the respective AR and MA models. Hence we
+denote the above equation as an ARIMA(p,d,q) model. 
 
 \begin{figure}
   \centering
@@ -247,95 +319,145 @@ ARIMA(p,d,q) model.
   \label{fig:ARIMA}
 \end{figure}
 
-From figure \ref{fig:ARIMA}, we see that the amount of divergence between predicted and actual values is much smaller due to including
-a moving average and inducing stationarity.
+From figure \ref{fig:ARIMA}, we see that the amount of divergence between
+predicted and actual values is much smaller due to including a moving average
+and inducing stationarity.
 
 
-To implement this model, we used the ARIMA module from the statsmodels package \cite{statsmodels}. There are, however, many
-ways to find the optimal $p,d,q$ values. Initially we thought that since our metric of evaluation is MAPE, we could optimize
-these parameters with respect to a validation MAPE and use those parameters to predict the future cases and deaths for a 
-particular state. To do this, a simple grid search was done where $p,d,q$ values ranged from $1$ to $10$ and the tuple with the
-lowest validation MAPE for that state was chosen. Initially we chose a validation size of 30 days. This yielded a final round 1 MAPE of $3.44$.
-Although this was better than the AR model, it was still below the baseline MAPE. In addition, we saw an increased number 
-of stationarity and convergence errors with our optimized set of tuples for certain states. In these cases, we had to resort to
-using our naive AR implementation as backup. This indicated that our tuple was not fully capturing the trends in our data
-by being optimizing for 30 days prior. 
+To implement this model, we used the ARIMA module from the statsmodels package
+\cite{statsmodels}. There are, however, many ways to find the optimal $p,d,q$
+values. Initially we thought that since our metric of evaluation is MAPE, we
+could optimize these parameters with respect to a validation MAPE and use those
+parameters to predict the future cases and deaths for a particular state. To do
+this, a simple grid search was done where $p,d,q$ values ranged from $1$ to
+$10$ and the tuple with the lowest validation MAPE for that state was chosen.
+Initially we chose a validation size of 30 days. This yielded a final round 1
+MAPE of $3.44$. Although this was better than the AR model, it was still below
+the baseline MAPE. In addition, we saw an increased number of stationarity and
+convergence errors with our optimized set of tuples for certain states. In
+these cases, we had to resort to using our naive AR implementation as backup.
+This indicated that our tuple was not fully capturing the trends in our data by
+being optimizing for 30 days prior. 
 
-Hence we chose to reduce our validation size to 7 days instead to see if having a larger amount of data and using a more
-recent validation set would lead to a more representative optimal $p,d,q$ tuple. This was indeed the case as we were able to
-get a round 1 MAPE of 2.96. We still ran into the stationarity and convergence errors and did have to use AR as a backup.
-In this vein, we reduced the validaiton size further to only 3 days but this led to a MAPE of 4.71 indicating that we overfit
-our validation data. 
+Hence we chose to reduce our validation size to 7 days instead to see if having
+a larger amount of data and using a more recent validation set would lead to a
+more representative optimal $p,d,q$ tuple. This was indeed the case as we were
+able to get a round 1 MAPE of 2.96. We still ran into the stationarity and
+convergence errors and did have to use AR as a backup. In this vein, we reduced
+the validaiton size further to only 3 days but this led to a MAPE of 4.71
+indicating that we overfit our validation data. 
 
-The auto arima module from the pmdarima package \cite{pmdarima} uses a grid search similar to before to find the optimal
-tuple. However, auto arima uses statistically rigorous stationarity tests (such as Augmented Dickey Fuller) to find 
-the optimal order of differencing $d$ after which the optimal $p,q$ are found by minimizing the Akaike Information Criterion (AIC).
-AIC is a measure of the quality of a model, it measures the likelihood of a model to predict future values \cite{AIC}. The equation
-to calculate AIC is given by \cite{AIC},
+The auto arima module from the pmdarima package \cite{pmdarima} uses a grid
+search similar to before to find the optimal tuple. However, auto arima uses
+statistically rigorous stationarity tests (such as Augmented Dickey Fuller) to
+find the optimal order of differencing $d$ after which the optimal $p,q$ are
+found by minimizing the Akaike Information Criterion (AIC). AIC is a measure of
+the quality of a model, it measures the likelihood of a model to predict future
+values \cite{AIC}. The equation to calculate AIC is given by \cite{AIC},
+
 \begin{equation}
-  AIC  = -2 \cdot \ln(L) + 2k
+AIC  = -2 \cdot \ln(L) + 2k
 \end{equation} 
-Where $L$ is the likelihood of the model, and $k$ is the number of estimated parameters. A model with a lower AIC value
-indicates a model of better quality. Optimizing by MAPE on a validation set runs the risk of being overfit to the validation
-set as seen when we reduced our validation size to 3 days. Hence when looking a generalizable models for our round 2 submission,
-it was important that we did not overfit to our current data. By using a measure that is trained insample and does not depend
-on a validation set, the generalizability of the model increases. By optimzing for AIC we did get a lower MAPE than our previous
-models so this was chosen as the optimization criteria when a state is trained using this method.
+
+Where $L$ is the likelihood of the model, and $k$ is the number of estimated
+parameters. A model with a lower AIC value indicates a model of better quality.
+Optimizing by MAPE on a validation set runs the risk of being overfit to the
+validation set as seen when we reduced our validation size to 3 days. Hence
+when looking a generalizable models for our round 2 submission, it was
+important that we did not overfit to our current data. By using a measure that
+is trained insample and does not depend on a validation set, the
+generalizability of the model increases. By optimzing for AIC we did get a
+lower MAPE than our previous models so this was chosen as the optimization
+criteria when a state is trained using this method.
 
 
 \subsection{HOLT}
-Previously, our ARIMA and AR models used a linear combination of previous days to predict future days as well as include an 
-order of differencing to induce stationarity. The linear combination in equation 3 implies that the learned $\phi$ and $\theta$
-weights has the same degree of importance to predicting $y_t$ since all the weights are of degree 1. This means that for 
-the ARIMA model each day has as similar degree of importance to the output. Obviously the magintude of the coefficients will
-determine which days are more important than others but since they are all a linear combination their degree of importance is
-nonetheless the same. In addition, by enforcing stationarity of the time series, we are intentionally ignoring any trend pattern
-which leads to a large loss of information regarding covid cases since the plateaus and exponential growth of deaths and 
-confirmed cases are meaningful in predicting future values.
 
-The Holt linear trend method, which shall be referrred to as Holt, is capable of working with time series models with trend
-as well as placing greater emphasis on more recent days as opposed to days further removed. From \ref{fig:ARIMA} we can see
-that ARIMA cannot predict the plateau of cases further out from the model. Hence by focusing on more recent days,
-it could be that local trends such as local plateauing or exponential growth can be better approximated. The Holt equations
-are a set of three equations for each time step. The trend equation \cite{forecasting} is given by
+Previously, our ARIMA and AR models used a linear combination of previous days
+to predict future days as well as include an order of differencing to induce
+stationarity. The linear combination in equation 3 implies that the learned
+$\phi$ and $\theta$ weights has the same degree of importance to predicting
+$y_t$ since all the weights are of degree 1. This means that for the ARIMA
+model each day has as similar degree of importance to the output. Obviously the
+magintude of the coefficients will determine which days are more important than
+others but since they are all a linear combination their degree of importance
+is nonetheless the same. In addition, by enforcing stationarity of the time
+series, we are intentionally ignoring any trend pattern which leads to a large
+loss of information regarding covid cases since the plateaus and exponential
+growth of deaths and confirmed cases are meaningful in predicting future
+values.
+
+The Holt linear trend method, which shall be referrred to as Holt, is capable
+of working with time series models with trend as well as placing greater
+emphasis on more recent days as opposed to days further removed. From
+\ref{fig:ARIMA} we can see that ARIMA cannot predict the plateau of cases
+further out from the model. Hence by focusing on more recent days, it could be
+that local trends such as local plateauing or exponential growth can be better
+approximated. The Holt equations are a set of three equations for each time
+step. The trend equation \cite{forecasting} is given by
+
 \begin{equation}
-  b_t = \beta^*(l_t - l_{t-1}) + (1-\beta^*)b_{t-1}
+b_t = \beta^*(l_t - l_{t-1}) + (1-\beta^*)b_{t-1}
 \end{equation}
-Where $b_t$ is an estimate of the slope at time $t$, $0 \leq \beta^* \leq 1$ is a smoothing parameter for the trend and 
-$l_t$ is an estimate of the level at $t$. To calculate the level \cite{forecasting}, we have
+
+Where $b_t$ is an estimate of the slope at time $t$, $0 \leq \beta^* \leq 1$ is
+a smoothing parameter for the trend and $l_t$ is an estimate of the level at
+$t$. To calculate the level \cite{forecasting}, we have
+
 \begin{equation}
-  l_t = \alpha y_t + (1 - \alpha)(l_{t-1} + b_{t-1})
+l_t = \alpha y_t + (1 - \alpha)(l_{t-1} + b_{t-1})
 \end{equation}
-Where $0 \leq \alpha \leq 1$ is a smoothing parameter for the level 
-Lastly, to forecast the value \cite{forecasting} we have that
+
+Where $0 \leq \alpha \leq 1$ is a smoothing parameter for the level Lastly, to
+forecast the value \cite{forecasting} we have that
+
 \begin{equation}
   y_{t+h|t} = l_t + hb_t
 \end{equation}
-We place less emphasis on previous days since if we want to caluclate $y_{t+1|t}$ we need the level and trend estimations of
-timestep $t$ which allows for a better understanding of the local trend at that time. Furthermore, unlike ARIMA when predicting
-future values, we do not use previously predicted values to predict future ones. Rather, once the final level $(l)$ and trend $(b)$ values
-are calculated , future time steps are a linear combination of that level and trend value $(l + hb)$ where $h$ denotes how far ahead
-the forecast must predict. Therefore, unlike AR and to an extent ARIMA, we remove the compound error issue and we do not need to introduce
-a moving average error equation to mitigate the compounded errors. 
 
-In terms of implementation, we used the Holt module from the statsmodels package \cite{statsmodels}. Using an internal optimization process,
-the ideal values of $\alpha, \beta^*, l_0, b_0$ are calculated after which the model calculates the remaining $l_t$ and $b_t$ values
-and forecasts the predicted time series for cases and deaths per state. Implemented in a homogenous manner, i.e. the same model applied 
-to all states, this model was our best peforming one, giving a round 1 MAPE of $2.289$. 
+We place less emphasis on previous days since if we want to caluclate
+$y_{t+1|t}$ we need the level and trend estimations of timestep $t$ which
+allows for a better understanding of the local trend at that time. Furthermore,
+unlike ARIMA when predicting future values, we do not use previously predicted
+values to predict future ones. Rather, once the final level $(l)$ and trend
+$(b)$ values are calculated , future time steps are a linear combination of
+that level and trend value $(l + hb)$ where $h$ denotes how far ahead the
+forecast must predict. Therefore, unlike AR and to an extent ARIMA, we remove
+the compound error issue and we do not need to introduce a moving average error
+equation to mitigate the compounded errors. 
+
+In terms of implementation, we used the Holt module from the statsmodels
+package \cite{statsmodels}. Using an internal optimization process, the ideal
+values of $\alpha, \beta^*, l_0, b_0$ are calculated after which the model
+calculates the remaining $l_t$ and $b_t$ values and forecasts the predicted
+time series for cases and deaths per state. Implemented in a homogenous manner,
+i.e. the same model applied to all states, this model was our best peforming
+one, giving a round 1 MAPE of $2.289$. 
 
 \begin{figure}
   \includegraphics[width=\linewidth]{figures/HOLT_Cali_Conf.png}
-  \caption{Confirmed Cases in California predicted using Holt Winters Linear Trend Method}
+  \caption{Confirmed Cases in California predicted using Holt Winters Linear
+  Trend Method}
   \label{fig:HOLT}
 \end{figure}
-From \ref{fig:HOLT} we see that our forecast is a line, which is a direct result of equation 7 and that the line is closer to the actual number 
-of confirmed cases than ARIMA. Therefore, the approximation of a local trend using the latest $l_t$ and $b_t$ values was indeed better than 
-linearly weighting a certain number of previous time steps for California. While the lower MAPE indicates that Holt is a better model overall,
-for certain states, Holt performs much worse than linear regression or ARIMA. When the states have a sudden increase or flattening of trend,
-for example in Wyoming, Holt does a bad job of giving a generally accurate forecast since the local approximations are often not indicative of 
-the evolution of cases and deaths in that state. Again, due to the local approximation issue, states who spiked in cases or deaths after the
-training set were also not accurately forecasted.
+
+From \ref{fig:HOLT} we see that our forecast is a line, which is a direct
+result of equation 7 and that the line is closer to the actual number of
+confirmed cases than ARIMA. Therefore, the approximation of a local trend using
+the latest $l_t$ and $b_t$ values was indeed better than linearly weighting a
+certain number of previous time steps for California. While the lower MAPE
+indicates that Holt is a better model overall, for certain states, Holt
+performs much worse than linear regression or ARIMA. When the states have a
+sudden increase or flattening of trend, for example in Wyoming, Holt does a bad
+job of giving a generally accurate forecast since the local approximations are
+often not indicative of the evolution of cases and deaths in that state. Again,
+due to the local approximation issue, states who spiked in cases or deaths
+after the training set were also not accurately forecasted.
+
 \subsection{Exponential Smoothing}
+
+
+
 \subsection{Long Short Term Memory Neural Networks}
 
 Neural networks are shown to be incredibly malleable since there is a plentiful
@@ -405,10 +527,10 @@ probabilistic modeling in order to predict and forecast future time-series
 data. Again, the MAPE results were very poor and its complexit was not worth
 the amount of time that we had.
 
-TBATS is a method that uses something called a Box-Cox transformations to 
-forecast future time series data points \cite{TBATS}. The MAPE results it yielded from
-a simple validation on the last week of data were too  poor to necessitate 
-further research and its complexity further hindered it.
+TBATS is a method that uses something called a Box-Cox transformations to
+forecast future time series data points \cite{TBATS}. The MAPE results it
+yielded from a simple validation on the last week of data were too  poor to
+necessitate further research and its complexity further hindered it.
 
 
 \subsection{Conclusions}
@@ -487,8 +609,8 @@ manual optimization tedious. In addition, we had no way of effectively
 determining the best \emph{start\_date} for a given model on a given state. 
 We opted to shift towards an automated approach towards model selection. 
 Otherwise, our methodology remained the same as in Round 1, where we would test
-multiple \emph{start\_dates} and validate them over a small validation set segregated
-from the original training data.
+multiple \emph{start\_dates} and validate them over a small validation set
+segregated from the original training data.
 
 Suppose that we are given $n$ days of training data, and are tasked with
 predicting $m$ days in the future. 
