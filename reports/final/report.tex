@@ -413,25 +413,27 @@ further research and its complexity further hindered it.
 
 \subsection{Conclusions}
 
-While the HOLT model typically gives us the lowest overall MAPE, it
-consistently underperforms on certain states. Linear Regression and ARIMA may
-yield significantly better results for these "problem states". However, it is
-not always easy to tell which states are going to cause problems with the HOLT
-model -- performance varies significantly based on the shape of the latest
-batch of test data. This heterogeneity makes it very difficult to pick a
-"favored model" for our time series predictions. 
+Methods such as LSTMs and Prophet were too complex for our use case and time
+duration. Given the amount of time we had and the necessary work needed, we
+could not optimize these methods and their hyperparameters for our situation
+and thus we disregarded using these methods for the final code submission.
+Our best performing metrics were simple univariate time series algorithms such
+as HOLT, linear regression, and ARIMA. 
 
-Methods such as LSTMs and Prophet were too complex for our use case and
-time duration. Given the amount of time we had and the necessary work needed 
-, we could not optimize these methods and their hyper parameter for our
-situation and thus we disregarded using these methods for the final code
-submission.
+Of these three models, HOLT model typically gives us the lowest overall MAPE.
+However, it consistently underperforms on certain states. Linear Regression and
+ARIMA may yield significantly better results for these "problem states".
+However, it is not always easy to tell which states are going to cause problems
+with the HOLT model -- performance varies significantly based on the shape of
+the latest batch of test data. This heterogeneity makes it very difficult to
+pick a "favored model" for our time series predictions. 
 
-Not all of our results were mixed. While model performance varied significantly
-based on the target state, the "optimal hyperparameters" used to train these
-models do not change significantly on a state-by-state basis. By performing
-grid search on each model's hyperparameters, we developed a group of
-parameterized models that handle general state data reasonably well. 
+However, not all of our conclusions are subject to this variance. While model
+\emph{performance} varied significantly based on the target state, the "optimal
+hyperparameters" used to train a given models do not change significantly on a
+state-by-state basis. By performing grid search on each model's
+hyperparameters, we developed a group of parameterized models that handle
+general state data reasonably well. 
 
 
 
