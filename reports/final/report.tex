@@ -68,6 +68,39 @@ on the number of coronavirus cases, such as Holt and ARIMA, for different affect
 which are shown to be statistically significant. Different iterative methods, based on cubic spline interpolation and Euler's methods
 are more novel developments in pursuit of accurately representing the spread of the virus \cite{APPADU2020}.
 
+\section{Data Preprocessing}
+Now moving on to actually wrangling the data for processing and straightforward input to our prospective models, 
+we first needed to examine the existing data to analyze where help was needed. Upon inspection of data types, it is noted 
+that much of our data is numerical, bar the categorical and ordinal columns of Province\_State and Date, respectively. 
+We chose to convert the date from a string type to datetime object type, to ease future parsing. 
+Using our contextual knowledge of our problem space, we chose to address the modeling problem from an individual 
+Province\_State perspective, i.e. we grouped our data by the Province\_State field. 
+From here on, we will refer to this “Province\_State” field simply as the “state”. 
+As a group we went back and forth on whether having so many models would result in higher variance due to the increased complexity of the model, 
+but we decided on separate models due to different restrictions imposed by policy makers on interstate travel and 
+the general thought that most people would be sheltering in place, and thus would not travel between states.
+
+\subsection{Round 1}
+Our initial imputation strategy went as follows: 
+We examined each state’s numeric data column by column. If null values comprised more than 70\% of the total data in the column, 
+we dropped the entire column; otherwise, we replaced all null values with the median value in our column. 
+After noting that this approach led to “plateaus” in our data, we tried linearly interpolating the values in each column. 
+This approach produces more organic data in each column, but fails to impute data at the beginning of a time series 
+(due to having no “base point” to interpolate off of). Because our current models treat every column separately, 
+we don’t anticipate that this will cause issues; we can drop NaN values to create new “columns” that are perfectly interpolated, but start at a later date.  
+\\
+After interpolating the data, we normalized it to zero mean unit variance. 
+At this time, we are still considering whether to normalize the data globally or within a single column. 
+Intuition would suggest that a column-wise approach would be best. We performed these steps before really definitively knowing 
+what sort of modeling approach we were interested in taking, as we will discuss, this normalization was ultimately unused, 
+since we were working with more direct regression methods that did not benefit from this scaling, but did drop the null data points.
+
+\subsection{Round 2}
+At this point in time, we decided on scrapping our explorations of different forecasting implementations to be detailed below, 
+and focused on univariate feature fitting methodologies for forecasting a function to fit the observed count of confirmed cases and deaths, 
+namely that of Holt-Winters exponential smoothing, ARIMA for forecasting, and a simple linear model from a particular day offset. 
+As a result, we did not normalize our data and just allowed the models to drop the null values from the training dataset.
+
 \section{Model Performance}
 \subsection{Linear Regression}
 \subsection{ARIMA}
