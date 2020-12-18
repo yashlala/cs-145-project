@@ -89,28 +89,70 @@ grid search on each model's hyperparameters, we developed a group of
 parameterized models that handle general state data reasonably well. 
 
 
-\section{Model Design}
+\section{Predictor Design}
 
 The pros and cons (as well as the relative efficacy) of each model have already
 been discussed. Faced with such a diversity of model performance, we opted to
-use a hybrid model for our overall submission. Rather than cherry picking the
-best-performing models for each state, we opted to use an automated approach. 
+use a hybrid model for our overall submission. 
 
-Suppose we have to predict $m$ days into the future. 
+Both rounds used a univariate data model (ie. trained only on the number of
+deaths or confirmed cases), and were trained state-by-state (ie. a new model
+was trained on each state's data; this model's predictions became our
+predictions for the given state). An overview of our methodology follows. 
 
-Our model first segregates the data by state. For each state,
+\subsection{Round 1}
 
-\section{TODO TODO TODO TODO}
-% did I mention this is TODO?
+Our Round 1 modelling method used a comparatively straightfoward "hybrid"
+approach. We split our training data by state, then manually ran HOLT and
+linear regression models on the state's data (using the last few weeks as
+validation data). We noted which models gave us a lower MAPE for which states,
+and hardcoded these $(state, model)$ associations into our script, assuming
+that these trends would hold. For example, linear regression usually
+outperformed HOLT for predicting deaths in the state of Montana; we accordingly
+instructed the computer to always use linear regression when predicting
+Montana's deaths. 
 
-First, we segregate the data. Given $n$ days of training data, our model uses
-the first $n-2$ days to train on (we'll call this set $T$) and the last $2$
-days as a validation dataset (we'll call this subdivision $V$). 
-We then train Linear Regression, HOLT, and ARIMA models on $T$, predicting
-$m+2$ days into the future. We take the first $2$ days of these predictions,
-and calculate the MAPE using $V$. After comparing the MAPEs of each model on
-$V$, we choose the model that gives us the lowest MAPE for that particular
-state, and return the remaining $m$ days of predictions. 
+However, this mapping wasn't sufficient. 
+Model performance is a function of the total amount of data given to the model;
+for time series data, this includes our start date. Linear regression, for
+example, may perform better when given only the last 2 weeks of data (to
+understand why, consider the effect of step size on linear gradient descent
+when trying to fit an exponential curve). 
+Every model was thus given a \emph{start date} parameter, which was defined as
+the date of the oldest training datapoint that the model received. 
+For Round 1, we set this parameter manually on a state-by-state basis by
+hardcoding it into our script. 
+
+After building up this database of optimal start dates and optimal models, we
+wrote a Python script that trained the given models (using \cite{scikit-learn}'s
+\texttt{linear_model.LinearRegression} class and the \texttt{Holt} module from
+the \cite{statsmodels} library). We then used the library routines to give us
+time series predictions for the required number of days. 
+
+
+\subsection{Round 2}
+
+
+After completing Round 1 of the project, we began to realize that manually
+cherry-picking an appropriate model for each state was not scalable. 
+
+We had no way to test quick adjustments to our hyperparameters, which made
+manual optimization tedious. In addition, we had no way of effectively
+determining the best \emph{start_date} for a given model on a given state. 
+We opted to shift towards an automated approach towards model selection. 
+Otherwise, our methodology remained the same as in Round 1. 
+
+Suppose that we are given $n$ days of training data, and are tasked with
+predicting $m$ days in the future. 
+
+First, we segregate the data again. Given $n$ days of training data, our model
+uses the first $n-2$ days to train on (we'll call this set $T$) and the last
+$2$ days as a validation dataset (we'll call this subdivision $V$). We then
+train Linear Regression, HOLT, and ARIMA models on $T$, predicting $m+2$ days
+into the future. We take the first $2$ days of these predictions, and calculate
+the MAPE using $V$. After comparing the MAPEs of each model on $V$, we choose
+the model that gives us the lowest MAPE for that particular state, and return
+the remaining $m$ predicted days. 
 
 After observing our hybrid model, we noted two trends: 
 \begin{itemize}
@@ -133,7 +175,8 @@ and HOLT both get an MAPE of $8.675309 \pm (\epsilon = 0.001)$, our framework
 will use HOLT to predict the values for the state. Our framework prefers HOLT
 to linear regression if the MAPEs are similar, but doesn't put ARIMA into this
 "margin" framework (ie. if ARIMA yields the lowest MAPE, ARIMA will always be
-chosen). 
+chosen). The addition of this $\epsilon$ parameter yielded an experimental 
+MAPE improvement of around 0.05. 
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{report}
