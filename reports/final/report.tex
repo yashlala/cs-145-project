@@ -260,7 +260,7 @@ to calculate AIC is given by \cite{AIC},
   AIC  = -2 \cdot \ln(L) + 2k
 \end{equation} 
 Where $L$ is the likelihood of the model, and $k$ is the number of estimated parameters. A model with a lower AIC value
-indicates a model of better quality. Optimizing on by MAPE on a validation set runs the risk of being overfit to the validation
+indicates a model of better quality. Optimizing by MAPE on a validation set runs the risk of being overfit to the validation
 set as seen when we reduced our validation size to 3 days. Hence when looking a generalizable models for our round 2 submission,
 it was important that we did not overfit to our current data. By using a measure that is trained insample and does not depend
 on a validation set, the generalizability of the model increases. By optimzing for AIC we did get a lower MAPE than our previous
@@ -268,6 +268,57 @@ models so this was chosen as the optimization criteria when a state is trained u
 
 
 \subsection{HOLT}
+Previously, our ARIMA and AR models used a linear combination of previous days to predict future days as well as include an 
+order of differencing to induce stationarity. The linear combination in equation 3 implies that the learned $\phi$ and $\theta$
+weights has the same degree of importance to predicting $y_t$ since all the weights are of degree 1. This means that for 
+the ARIMA model each day has as similar degree of importance to the output. Obviously the magintude of the coefficients will
+determine which days are more important than others but since they are all a linear combination their degree of importance is
+nonetheless the same. In addition, by enforcing stationarity of the time series, we are intentionally ignoring any trend pattern
+which leads to a large loss of information regarding covid cases since the plateaus and exponential growth of deaths and 
+confirmed cases are meaningful in predicting future values.
+
+The Holt linear trend method, which shall be referrred to as Holt, is capable of working with time series models with trend
+as well as placing greater emphasis on more recent days as opposed to days further removed. From \ref{fig:ARIMA} we can see
+that ARIMA cannot predict the plateau of cases further out from the model. Hence by focusing on more recent days,
+it could be that local trends such as local plateauing or exponential growth can be better approximated. The Holt equations
+are a set of three equations for each time step. The trend equation \cite{forecasting} is given by
+\begin{equation}
+  b_t = \beta^*(l_t - l_{t-1}) + (1-\beta^*)b_{t-1}
+\end{equation}
+Where $b_t$ is an estimate of the slope at time $t$, $0 \leq \beta^* \leq 1$ is a smoothing parameter for the trend and 
+$l_t$ is an estimate of the level at $t$. To calculate the level \cite{forecasting}, we have
+\begin{equation}
+  l_t = \alpha y_t + (1 - \alpha)(l_{t-1} + b_{t-1})
+\end{equation}
+Where $0 \leq \alpha \leq 1$ is a smoothing parameter for the level 
+Lastly, to forecast the value \cite{forecasting} we have that
+\begin{equation}
+  y_{t+h|t} = l_t + hb_t
+\end{equation}
+We place less emphasis on previous days since if we want to caluclate $y_{t+1|t}$ we need the level and trend estimations of
+timestep $t$ which allows for a better understanding of the local trend at that time. Furthermore, unlike ARIMA when predicting
+future values, we do not use previously predicted values to predict future ones. Rather, once the final level $(l)$ and trend $(b)$ values
+are calculated , future time steps are a linear combination of that level and trend value $(l + hb)$ where $h$ denotes how far ahead
+the forecast must predict. Therefore, unlike AR and to an extent ARIMA, we remove the compound error issue and we do not need to introduce
+a moving average error equation to mitigate the compounded errors. 
+
+In terms of implementation, we used the Holt module from the statsmodels package \cite{statsmodels}. Using an internal optimization process,
+the ideal values of $\alpha, \beta^*, l_0, b_0$ are calculated after which the model calculates the remaining $l_t$ and $b_t$ values
+and forecasts the predicted time series for cases and deaths per state. Implemented in a homogenous manner, i.e. the same model applied 
+to all states, this model was our best peforming one, giving a round 1 MAPE of $2.289$. 
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{figures/HOLT_Cali_Conf.png}
+  \caption{Confirmed Cases in California predicted using Holt Winters Linear Trend Method}
+  \label{fig:HOLT}
+\end{figure}
+From \ref{fig:HOLT} we see that our forecast is a line, which is a direct result of equation 7 and that the line is closer to the actual number 
+of confirmed cases than ARIMA. Therefore, the approximation of a local trend using the latest $l_t$ and $b_t$ values was indeed better than 
+linearly weighting a certain number of previous time steps for California. While the lower MAPE indicates that Holt is a better model overall,
+for certain states, Holt performs much worse than linear regression or ARIMA. When the states have a sudden increase or flattening of trend,
+for example in Wyoming, Holt does a bad job of giving a generally accurate forecast since the local approximations are often not indicative of 
+the evolution of cases and deaths in that state. Again, due to the local approximation issue, states who spiked in cases or deaths after the
+training set were also not accurately forecasted.
 \subsection{Exponential Smoothing}
 \subsection{Long Short Term Memory Neural Networks}
 
