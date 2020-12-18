@@ -655,9 +655,45 @@ will use HOLT to predict the values for the state. Our framework prefers HOLT
 to linear regression if the MAPEs are similar, but doesn't put ARIMA into this
 "margin" framework (ie. if ARIMA yields the lowest MAPE, ARIMA will always be
 chosen). The addition of this $\epsilon$ parameter yielded an experimental 
-MAPE improvement of around 0.05. 
+MAPE improvement of around 0.05, giving us an overall confirmed MAPE value of
+1.26 for confirmed cases and 1.69 for the confirmed deaths (on validation
+dataset $V$). 
+
 
 \section{Conclusion}
+
+Our team was given a wealth of multivariate COVID-related data ranging from
+hospitalizations to death rates to population movements. We also had access to
+a trove of time-series forecasting algorithms, libraries, and testing
+frameworks. In the end, however, we didn't need many of these resources of this
+data to generate accurate predictions. 
+Forays into more complex models and frameworks such as Gluonts, LSTMs, and
+Prophet were unproductive; these suites were usually outperformed by simple
+univariate time-series models such as Linear Regression, HOLT, and ARIMA. 
+
+Through various explorations, we established an optimal set of hyperparameters
+for each of these three models, then tested their performance on our state
+data. When confronted with variability in terms of model performance, we opted
+to shift our model selection criterion to a non-opinionated, empirical,
+validation-based approach as opposed to choosing an algorithm for a theoretical
+benefit. By wrapping this testing framework in an automated script, we built a
+program that would optimize its own hyperparameters based on its MAPE on the
+provided dataset, yielding the "optimal" combination of HOLT, ARIMA, and linear
+regression under the strong assumption that each model's performance on the
+validation dataset would reflect its performance on the test dataset. 
+This yielded a respectable total MAPE (over $V$) of 1.26 for confirmed case
+rates and 1.69 for death rates. 
+
+Overall, we believe these results speak strongly to the nature of unpredictable
+events and to the nature of data science; while we can build models to take
+advantage of theoretical nuances in certain data types, we should always be
+careful to \emph{check} the performance on real world data. Theoretically
+accurate algorithms can be divorced from practically accurate algorithms -- by
+taking advantage of modern hardware to carefully optimize our hyperparameters,
+we can often create models such as linear regression that outperform Prophet.
+The benefits of validation data and empirical performance data cannot be
+understated. 
+
 
 \section{Task Distribution Form}
 
