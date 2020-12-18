@@ -189,10 +189,11 @@ This led to an optimal $p$ of 3, however, our MAPE was still very high at $11.3$
 confirmed cases diverged significantly from the true values as time went on. When the AR model predicts future unseen values,
 we have shown that the model must use previous time steps to predict the current one. Hence when looking at unseen data, 
 the model will use previously predicted values to predict future values. This leads to a compounding of error and thus 
-results in a diverging relationship between the true values and the predicted ones as can be seen in figure 1.
+results in a diverging relationship between the true values and the predicted ones as can be seen in figure \ref{fig:AR}.
 \begin{figure}
   \includegraphics[width=\linewidth]{./figures/Section2_AR_Cali_Conf.png}
   \caption{Confirmed Cases in California predicted using AR}
+  \label{fig:AR}
 \end{figure} 
 Our final round 1 MAPE using AR was $4.12$
 The issue with our implementation of the model is that we did not enforce the stationarity of the data which 
@@ -222,6 +223,17 @@ $y'_j$ not the original time series $y_j$. As we mentioned, differencing can occ
 we let the the number of time the data is differenced be denoted as $d$ the degree of differencing. Furthermore, we are
 already aware of the parameters $p$ and $q$ from the respective AR and MA models. Hence we denote the above equation as an
 ARIMA(p,d,q) model. 
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{figures/Section2_ARIMA_Cali_Conf.png}
+  \caption{Confirmed Cases in California predicted using ARIMA}
+  \label{fig:ARIMA}
+\end{figure}
+
+From figure \ref{fig:ARIMA}, we see that the amount of divergence between predicted and actual values is much smaller due to including
+a moving average and inducing stationarity.
+
 
 To implement this model, we used the ARIMA module from the statsmodels package \cite{statsmodels}. There are, however, many
 ways to find the optimal $p,d,q$ values. Initially we thought that since our metric of evaluation is MAPE, we could optimize
