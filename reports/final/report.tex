@@ -69,23 +69,23 @@ profile from as early as April, we are specifically interested in the ability
 to predict the number of cases and deaths for a particular state.
 
 \subsection{Related Work}
-
-Notable advances in this domain are noted, Nesteruk \cite{Nesteruk} employs the
-Susceptible, Infected, Removed (SIR) paradigm – which aims to find different
-correlated differential equations to model flow between different partitions of
-the studied population – and the subsequent progression of the pandemic. Yonar
-\cite{EJMO} uses different more direct curve estimation methods on the number
-of coronavirus cases, such as Holt and ARIMA, for different affected countries
-of interest, (e.g. Germany, Japan, Turkey, UK, .etc), which are shown to be
-statistically significant. Different iterative methods, based on cubic spline
-interpolation and Euler's methods are more novel developments in pursuit of
-accurately representing the spread of the virus \cite{APPADU2020}.
+Notable advances in this domain are noted. Nesteruk \cite{Nesteruk} models the
+progression of the pandemic using the Susceptible, Infected, Removed (SIR)
+paradigm, which aims to find correlated differential equations to model flow
+between different partitions of the studied population. 
+\cite{EJMO} uses more direct curve estimation methods such as Holt and ARIMA on
+the number of coronavirus cases in of interest, (e.g. Germany, Japan, Turkey,
+the UK, etc.). These models predict the actual number of coronavirus cases to a
+high degree of statistical significance. 
+Others have applied novel iterative methods based on cubic spline interpolation
+and Euler's methods towards predicting the spread of the virus \cite{APPADU2020}.
 
 \section{Data Preprocessing}
-
 Now moving on to actually wrangling the data for processing and straightforward
 input to our prospective models, we first needed to examine the existing data
-to analyze where help was needed. Upon inspection of data types, it is noted
+to analyze where help was needed. 
+
+Upon inspection of data types, it is noted
 that much of our data is numerical, bar the categorical and ordinal columns of
 Province\_State and Date, respectively. We chose to convert the date from a
 string type to datetime object type, to ease future parsing. Using our
@@ -100,7 +100,6 @@ general thought that most people would be sheltering in place, and thus would
 not travel between states.
 
 \subsection{Round 1}
-
 Our initial imputation strategy went as follows: We examined each state’s
 numeric data column by column. If null values comprised more than 70\% of the
 total data in the column, we dropped the entire column; otherwise, we replaced
@@ -123,7 +122,6 @@ direct regression methods that did not benefit from this scaling, but did drop
 the null data points.
 
 \subsection{Round 2}
-
 At this point in time, we decided on scrapping our explorations of different
 forecasting implementations to be detailed below, and focused on univariate
 feature fitting methodologies for forecasting a function to fit the observed
@@ -132,37 +130,39 @@ smoothing, ARIMA for forecasting, and a simple linear model from a particular
 day offset. As a result, we did not normalize our data and just allowed the
 models to drop the null values from the training dataset.
 
+However, for this round, we needed to obtain new data since our round 2 dataset
+only went up to November 22nd. To do this, we created a simple Python web scraper that 
+would download the new daily files from the Johns Hopkins University CSSE COVID-19 
+dataset \cite{JHUdataset} which updates everyday with a new comma-separated-values file.
+Thus we were able to obtain the confirmed COVID-19 case and death count of each state
+within the US up to December 5th, 2020.
+
 
 \section{Problem Definition}
-
-%% TODO: might be a bit too long and too detailed 
-%% not sure what to edit so I just wrote a lot (easier to cut than to write more)
-
-Currently with surging cases and deaths, the medical infrastructure in the
-United States cannot keep up. They cannot prepare for these pandemic surges and
-thus would need to find a way to predict when they will happen. Thus, the
-problem set to be solved in these experiments is to create a method utilizing
-the foundations and skills learned from CS 145 at UCLA to predict the cases in
-each state of the United States for a given amount of time. 
-
-%%TODO: cite the dataset
+We are given a dataset of various COVID-related features (eg. testing rate,
+deaths, confirmed cases), as well as a dataset of various movement-related data
+(traffic flow into and out of two states, respectively). 
+We must train a machine learning model on this data, and use it to predict the
+future rates of death and confirmed cases of COVID-19. 
 
 The competition is divided into 2 rounds. The first round was to predict the
 case and death count of each of the 50 states from September 1st to September
 26th given any COVID-19 related data from April 12th to August 31st. The second
 round was to predict the case and death count of each of the 50 states during
-the winter holiday surge, specifically from December 7th to December 12th. For
+the winter holiday surge, specifically from December 7th to December 12th. 
+For
 the second round, the method can train on any any COVID-19 related data from
 April 12th to December 6th. 
 
-The accuracy of the prediction will be evaluated with the mean absolute
-percentage error (MAPE) which averages the absolute error on all data points.
-Equation is given below.
+Our model's accuracy will be gauged via the Mean Absolute Percentage Error
+(MAPE) metric, which is defined as the average of the absolute error over all
+data points as per the equation below. 
 
 $$MAPE = \frac{1}{n} \sum_{i = 1}^{n} |\frac{p_i - a_i}{a_i} |$$
 
-$n$ symbolizes the size of the dataset. $p_i$ symbolizes the predicted value at
-index $i$. $a_i$ symbolizes the actual value at index $i$.
+$n$ is defined as the size of the dataset. $p_i$ symbolizes the predicted value
+of a feature at index $i$. $a_i$ symbolizes the actual value of the feature at
+index $i$.
 
 
 \section{Model Performance}
@@ -326,7 +326,11 @@ Neural networks are shown to be incredibly malleable since there is a plentiful
 amount of hyperparameters to tune and to create ranging from the type of
 activation function to the architecture of the network. For sequential data
 specifically, recurrent neural networks or RNNs work well mostly because it
-allows previous outputs to be used as inputs while having hidden states. 
+allows previous outputs to be used as inputs while having hidden states.  
+In the context of time series prediction and the task at hand, RNNs work well
+since it can utilize previous timestamped or predicted data to predict other
+output data. Inside each layer and node are specific functions that manipulate
+the inputs known as gates.
 
 \begin{figure}
   \centering
@@ -335,11 +339,6 @@ allows previous outputs to be used as inputs while having hidden states.
   cells are a part of the hidden layer}
   \label{fig:rnn}
 \end{figure}
-
-In the context of time series prediction and the task at hand, RNNs work well
-since it can utilize previous timestamped or predicted data to predict other
-output data. Inside each layer and node are specific functions that manipulate
-the inputs known as gates.
 
 Within the context of RNNs, there is a set of specific RNNs called Long Short
 Term Memory Neural Networks or LSTM for short. What is specific of the LSTM is
@@ -353,19 +352,18 @@ we needed to validate this method. Using the PyTorch neural network framework
 \cite{Pytorch}, a simple RNN neural network of 1 layer with 50 LSTM nodes was
 tested on a subset of the round 1 data. 
 
-The experimentation procedure would use the confirmed case and death count data
-from April 12th to August 17th for the state of California and then validating
-the MAPE over a period of 14 days, August 18th to August 31st. The neural
-network will be trained over a varied amount of epochs and learning rates. 
-
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{figures/LSTMPytorch.png}
   \caption{LSTM predictions on data pertaining to California}
-  \label{fig:LSTMtrial}
-\end{figure}
+  \label{fig:LSTM_trial}
+\end{figure} 
 
-Attached on Figure  \ref{fig:LSTMtrial} is an example trial run of our
+The experimentation procedure would use the confirmed case and death count data
+from April 12th to August 17th for the state of California and then validating
+the MAPE over a period of 14 days, August 18th to August 31st. The neural
+network will be trained over a varied amount of epochs and learning rates. 
+Attached on Figure  \ref{fig:LSTM_trial} is an example trial run of our
 prediction using the PyTorch neural network. The MAPE on this was around $6.93$
 which was much higher than the other methods.
 
@@ -382,6 +380,12 @@ not always easy to tell which states are going to cause problems with the HOLT
 model -- performance varies significantly based on the shape of the latest
 batch of test data. This heterogeneity makes it very difficult to pick a
 "favored model" for our time series predictions. 
+
+Methods such as LSTMs and Prophet were too complex for our use case and
+time duration. Given the amount of time we had and the necessary work needed 
+, we could not optimize these methods and their hyper parameter for our
+situation and thus we disregarded using these methods for the final code
+submission.
 
 Not all of our results were mixed. While model performance varied significantly
 based on the target state, the "optimal hyperparameters" used to train these
@@ -439,10 +443,19 @@ We had no way to test quick adjustments to our hyperparameters, which made
 manual optimization tedious. In addition, we had no way of effectively
 determining the best \emph{start\_date} for a given model on a given state. 
 We opted to shift towards an automated approach towards model selection. 
-Otherwise, our methodology remained the same as in Round 1. 
+Otherwise, our methodology remained the same as in Round 1, where we would test
+multiple \emph{start\_dates} and validate them over a small validation set segregated
+from the original training data.
 
 Suppose that we are given $n$ days of training data, and are tasked with
 predicting $m$ days in the future. 
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{figures/Final_model.jpg}
+  \caption{An flowchart of what our Round 2 model does}
+  \label{fig:model_final}
+\end{figure}
 
 First, we segregate the data again. Given $n$ days of training data, our model
 uses the first $n-2$ days to train on (we'll call this set $T$) and the last
@@ -451,7 +464,9 @@ train Linear Regression, HOLT, and ARIMA models on $T$, predicting $m+2$ days
 into the future. We take the first $2$ days of these predictions, and calculate
 the MAPE using $V$. After comparing the MAPEs of each model on $V$, we choose
 the model that gives us the lowest MAPE for that particular state, and return
-the remaining $m$ predicted days. 
+the remaining $m$ predicted days. An example iteration can be seen in the 
+Figure \ref{fig:model_final} which shows a visual flowchart of what is being done
+for each state.
 
 After observing our hybrid model, we noted two trends: 
 \begin{itemize}
@@ -476,6 +491,59 @@ to linear regression if the MAPEs are similar, but doesn't put ARIMA into this
 "margin" framework (ie. if ARIMA yields the lowest MAPE, ARIMA will always be
 chosen). The addition of this $\epsilon$ parameter yielded an experimental 
 MAPE improvement of around 0.05. 
+
+\section{Conclusion}
+
+\section{Task Distribution Form}
+
+We'll be referring to group members by their initials: Hamlin Liu is HL; Juan
+Estrada is JE; Justin Yi is JY; Shriniket Buche is SB; Yash Lala is YL. 
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+         Task & People  \\
+         \hline \hline
+         Exploratory Data Analysis & HL, JE, JY, SB, YL \\
+         \hline
+         Normalization code & JY \\
+         \hline
+         Linear Regression testing & JE \\
+         \hline
+         ARIMA testing & SB \\
+         \hline
+         AR testing & SB \\
+         \hline
+         HOLT testing & JE, SB \\
+         \hline
+         LSTM and BiLSTM model testing & HL, SB  \\
+         \hline
+         VAR model testing & JY, SB \\
+         \hline
+         Gluonts, Prophet, and BATS model testing & SB \\
+         \hline
+         Data Clustering & JY, YL \\
+         \hline
+         Data Interpolation & YL \\
+         \hline
+         Midterm Report Writing & HL, JE, JY, SB, YL \\
+         \hline
+         Midterm Report Formatting & HL, YL \\
+         \hline
+         Scraping for new data & HL \\
+         \hline
+         Kaggle Submissions & JE, SB \\
+         \hline
+         Round 1 code & HL, JE \\
+         \hline
+         Round 2 code & HL, JY, YL \\
+         \hline
+         Final Report writing & HL, JE, JY, SB, YL \\
+         \hline
+    \end{tabular}
+\end{table}
+
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{report}
