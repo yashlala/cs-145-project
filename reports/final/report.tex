@@ -134,6 +134,8 @@ smoothing, ARIMA for forecasting, and a simple linear model from a particular
 day offset. As a result, we did not normalize our data and just allowed the
 models to drop the null values from the training dataset.
 
+However, for this round, we needed 
+
 
 \section{Problem Definition}
 
@@ -173,7 +175,11 @@ Neural networks are shown to be incredibly malleable since there is a plentiful
 amount of hyperparameters to tune and to create ranging from the type of
 activation function to the architecture of the network. For sequential data
 specifically, recurrent neural networks or RNNs work well mostly because it
-allows previous outputs to be used as inputs while having hidden states. 
+allows previous outputs to be used as inputs while having hidden states.  
+In the context of time series prediction and the task at hand, RNNs work well
+since it can utilize previous timestamped or predicted data to predict other
+output data. Inside each layer and node are specific functions that manipulate
+the inputs known as gates.
 
 \begin{figure}
   \centering
@@ -182,11 +188,6 @@ allows previous outputs to be used as inputs while having hidden states.
   cells are a part of the hidden layer}
   \label{fig:rnn}
 \end{figure}
-
-In the context of time series prediction and the task at hand, RNNs work well
-since it can utilize previous timestamped or predicted data to predict other
-output data. Inside each layer and node are specific functions that manipulate
-the inputs known as gates.
 
 Within the context of RNNs, there is a set of specific RNNs called Long Short
 Term Memory Neural Networks or LSTM for short. What is specific of the LSTM is
@@ -199,19 +200,17 @@ Given this context, and before using this method as our main modeling choice,
 we needed to validate this method. Using the PyTorch neural network framework
 \cite{Pytorch}, a simple RNN neural network of 1 layer with 50 LSTM nodes was
 tested on a subset of the round 1 data. 
-
-The experimentation procedure would use the confirmed case and death count data
-from April 12th to August 17th for the state of California and then validating
-the MAPE over a period of 14 days, August 18th to August 31st. The neural
-network will be trained over a varied amount of epochs and learning rates. 
-
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{figures/LSTMPytorch.png}
   \caption{LSTM predictions on data pertaining to California}
   \label{fig:LSTM_trial}
-\end{figure}
+\end{figure} 
 
+The experimentation procedure would use the confirmed case and death count data
+from April 12th to August 17th for the state of California and then validating
+the MAPE over a period of 14 days, August 18th to August 31st. The neural
+network will be trained over a varied amount of epochs and learning rates. 
 Attached on Figure  \ref{fig:LSTM_trial} is an example trial run of our
 prediction using the PyTorch neural network. The MAPE on this was around $6.93$
 which was much higher than the other methods.
@@ -229,6 +228,12 @@ not always easy to tell which states are going to cause problems with the HOLT
 model -- performance varies significantly based on the shape of the latest
 batch of test data. This heterogeneity makes it very difficult to pick a
 "favored model" for our time series predictions. 
+
+Methods such as LSTMs and Prophet were too complex for our use case and
+time duration. Given the amount of time we had and the necessary work needed 
+, we could not optimize these methods and their hyper parameter for our
+situation and thus we disregarded using these methods for the final code
+submission.
 
 Not all of our results were mixed. While model performance varied significantly
 based on the target state, the "optimal hyperparameters" used to train these
@@ -273,7 +278,7 @@ hardcoding it into our script.
 
 After building up this database of optimal start dates and optimal models, we
 wrote a Python script that trained the given models (using \cite{scikit-learn}'s
-\texttt{linear_model.LinearRegression} class and the \texttt{Holt} module from
+\texttt{linear\_model.LinearRegression} class and the \texttt{Holt} module from
 the \cite{statsmodels} library). We then used the library routines to give us
 time series predictions for the required number of days. 
 
@@ -284,12 +289,21 @@ cherry-picking an appropriate model for each state was not scalable.
 
 We had no way to test quick adjustments to our hyperparameters, which made
 manual optimization tedious. In addition, we had no way of effectively
-determining the best \emph{start_date} for a given model on a given state. 
+determining the best \emph{start\_date} for a given model on a given state. 
 We opted to shift towards an automated approach towards model selection. 
-Otherwise, our methodology remained the same as in Round 1. 
+Otherwise, our methodology remained the same as in Round 1, where we would test
+multiple \emph{start\_dates} and validate them over a small validation set segregated
+from the original training data.
 
 Suppose that we are given $n$ days of training data, and are tasked with
 predicting $m$ days in the future. 
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{figures/Final_model.jpg}
+  \caption{An flowchart of what our Round 2 model does}
+  \label{fig:model_final}
+\end{figure}
 
 First, we segregate the data again. Given $n$ days of training data, our model
 uses the first $n-2$ days to train on (we'll call this set $T$) and the last
@@ -298,7 +312,9 @@ train Linear Regression, HOLT, and ARIMA models on $T$, predicting $m+2$ days
 into the future. We take the first $2$ days of these predictions, and calculate
 the MAPE using $V$. After comparing the MAPEs of each model on $V$, we choose
 the model that gives us the lowest MAPE for that particular state, and return
-the remaining $m$ predicted days. 
+the remaining $m$ predicted days. An example iteration can be seen in the 
+Figure \ref{fig:model_final} which shows a visual flowchart of what is being done
+for each state.
 
 After observing our hybrid model, we noted two trends: 
 \begin{itemize}
@@ -324,8 +340,58 @@ to linear regression if the MAPEs are similar, but doesn't put ARIMA into this
 chosen). The addition of this $\epsilon$ parameter yielded an experimental 
 MAPE improvement of around 0.05. 
 
+\section{Conclusion}
+
+\section{Task Distribution Form}
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+         Task & People  \\
+         \hline \hline
+         Exploratory Data Analysis & Hamlin, Juan, Justin, Shrin, Yash\\
+         \hline
+         Normalization code & Justin\\
+         \hline
+         Linear Regression testing & Juan\\
+         \hline
+         ARIMA testing & Shrin\\
+         \hline
+         AR testing & Shrin\\
+         \hline
+         HOLT testing & Juan, Shrin\\
+         \hline
+         LSTM and BiLSTM model testing & Hamlin, Shrin \\
+         \hline
+         VAR model testing & Justin, Shrin\\
+         \hline
+         Gluonts, Prophet, and BATS model testing & Shrin\\
+         \hline
+         Data Clustering & Justin, Yash\\
+         \hline
+         Data Interpolation & Yash\\
+         \hline
+         Midterm Report Writing & Hamlin, Juan, Justin, Shrin, Yash\\
+         \hline
+         Midterm Report Formatting & Hamlin, Yash\\
+         \hline
+         Scraping for new data & Hamlin\\
+         \hline
+         Kaggle Submissions & Juan, Shrin\\
+         \hline
+         Round 1 code & Hamlin, Juan\\
+         \hline
+         Round 2 code & Hamlin, Justin, Yash\\
+         \hline
+         Final Report writing & Hamlin, Juan, Justin, Shrin, Yash\\
+         \hline
+    \end{tabular}
+\end{table}
+
+
 \bibliographystyle{ACM-Reference-Format}
-\bibliography{report}
+\bibliography{test}
 
 \end{document}
 \endinput
