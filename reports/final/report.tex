@@ -167,6 +167,22 @@ index $i$.
 
 \section{Model Performance}
 \subsection{Linear Regression}
+The very first model we tried was Linear Regression. Linear Regression tries to fit a best fit linear line through our data by minimizing the sum of squares between the outputted line and our data points\cite{scikit-learn}. With this type of model we would be able to predict cases based on the average increase in cases over time. This approach alone would not produce good results on its own for multiple reasons. One is that the increasing amount of confirmed cases and deaths are not linear clearly seen in Figure \ref{fig:linreg}. Another is that linear regression is affected greatly by the lag period of low cases in many states as the virus first began to spread. To combat this we chose many different start dates that were after the lag period for many different states. The results were much better this way. This approach did very well predicting our test data for some states, not as much for others. In our midterm report we wrote that we decided not to go ahead with this approach as we believed we could not go further than beating the baseline. However we later came back to linear regression and used it for the particular states that it performed well on, and compared this to our other models like Holt. This included states like Hawaii, Arizona, Oklahoma, Wyoming, and Vermont. We decided to use this model for some states on our Kaggle submission and again on our final submission. 
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{figures/7-linear-reg.png}
+  \caption{Example of Linear Regression: $x$ is the numbers of days past our start date of April 1st, $y$ is the fitted line of confirmed cases for Arizona}
+  \label{fig:linreg}
+\end{figure}
+\subsection{Polynomial Fitting}
+To try and mimic the exponential increase that linear regression couldn't do, we chose to try a polynomial fitting approach. Polynomial fitting tries to best fit a line through our data points of degree N. So our hope is that the line continuing past our training data would better reflect the trend a particular state is showing. We used the scikit-learn package to transform our input to work with the degree N we want to fit\cite{scikit-learn}. This approach worked great at fitting our training data points. It also did a very good job at predicting the next few days for many states. We got best results with fitting a line of degree 3 and 5. We ended up deciding we would not go forward with it. We decided this because when it tries to fit the training data, the trend a few days after the end can either shoot upwards exponentially or begin to dip downward, where the number of predicted cases or deaths is actually lower than the previous day. We see this happening in Figure \ref{fig:polyfit} for the state of Arizona with a degree of 3. We thought we could mitigate this by predicting a few days ahead and then refitting until we had our full prediction. The big downfall of this approach is that it would compound any error we produced with our predictions to every other prediction made afterwards.
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{figures/7-poly-fit.png}
+  \caption{Example of Polynomial Fitting: $x$ is the numbers of days past our start date of April 1st, $y$ is the fitted line of confirmed cases for Arizona}
+  \label{fig:polyfit}
+\end{figure}
+
 \subsection{ARIMA}
 Given the issue of producing predictions of confirmed cases and deaths without
 having access to the values of the other features we would want to include in 
