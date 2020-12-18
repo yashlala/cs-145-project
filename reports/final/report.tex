@@ -37,80 +37,133 @@
 
 \begin{abstract}
 
-COVID-19, the theme of our CS 145 project, has been classified as a worldwide pandemic. 
-The rate of its spread is a complex function of local social distancing, government policy, 
-climate, and temporal factors, just to name a few. Detailed analysis of all of these contributory 
-causes is not humanly possible. However, we can build reasonably accurate disease models by using the 
-Data Mining techniques taught in CS 145. This report documents our team’s efforts towards analyzing 
-COVID-related data in over the majority of the year to allow for predictive forecasting. 
+COVID-19, the theme of our CS 145 project, has been classified as a worldwide
+pandemic. The rate of its spread is a complex function of local social
+distancing, government policy, climate, and temporal factors, just to name a
+few. Detailed analysis of all of these contributory causes is not humanly
+possible. However, we can build reasonably accurate disease models by using the
+Data Mining techniques taught in CS 145. This report documents our team’s
+efforts towards analyzing COVID-related data in over the majority of the year
+to allow for predictive forecasting. 
 
-We catalogue our problem at hand, initial data preprocessing, exploratory efforts toward modeling our problem, 
-and our future predictions as we construct a model capable of predicting fatalities caused by COVID-19, 
-namely through the use of a hybrid linear, exponential, and autoregressive models. 
+We catalogue our problem at hand, initial data preprocessing, exploratory
+efforts toward modeling our problem, and our future predictions as we construct
+a model capable of predicting fatalities caused by COVID-19, namely through the
+use of a hybrid linear, exponential, and autoregressive models. 
 
 \end{abstract}
 
 \maketitle
 
-\section{Introduction of overall goal and background}
-The increasing spread of COVID-19 poses a substantial impact on the status of global health and economy, 
-and having accurate forecasts of the number of affected can better inform local and national governmental 
-bodies to make decisions to promote public health and safety and keeping the economy afloat. 
-As we position to tackle this problem, we inspect our the data we have on hand: we were given reports of various 
-state-wide features of the COVID-19 infection profile from as early as April, we are specifically interested in the ability 
+\section{Introduction}
+
+\subsection{Background}
+
+The increasing spread of COVID-19 poses a substantial impact on the status of
+global health and economy, and having accurate forecasts of the number of
+affected can better inform local and national governmental bodies to make
+decisions to promote public health and safety and keeping the economy afloat.
+As we position to tackle this problem, we inspect our the data we have on hand:
+we were given reports of various state-wide features of the COVID-19 infection
+profile from as early as April, we are specifically interested in the ability
 to predict the number of cases and deaths for a particular state.
 
-\section{Related Work}
-Notable advances in this domain are noted, Nesteruk \cite{Nesteruk} employs the Susceptible, Infected, Removed (SIR) paradigm
-– which aims to find different correlated differential equations to model flow between different partitions of the 
-studied population – and the subsequent progression of the pandemic. Yonar \cite{EJMO} uses different more direct curve estimation methods
-on the number of coronavirus cases, such as Holt and ARIMA, for different affected countries of interest, (e.g. Germany, Japan, Turkey, UK, .etc),
-which are shown to be statistically significant. Different iterative methods, based on cubic spline interpolation and Euler's methods
-are more novel developments in pursuit of accurately representing the spread of the virus \cite{APPADU2020}.
+\subsection{Related Work}
+
+Notable advances in this domain are noted, Nesteruk \cite{Nesteruk} employs the
+Susceptible, Infected, Removed (SIR) paradigm – which aims to find different
+correlated differential equations to model flow between different partitions of
+the studied population – and the subsequent progression of the pandemic. Yonar
+\cite{EJMO} uses different more direct curve estimation methods on the number
+of coronavirus cases, such as Holt and ARIMA, for different affected countries
+of interest, (e.g. Germany, Japan, Turkey, UK, .etc), which are shown to be
+statistically significant. Different iterative methods, based on cubic spline
+interpolation and Euler's methods are more novel developments in pursuit of
+accurately representing the spread of the virus \cite{APPADU2020}.
 
 \section{Data Preprocessing}
-Now moving on to actually wrangling the data for processing and straightforward input to our prospective models, 
-we first needed to examine the existing data to analyze where help was needed. Upon inspection of data types, it is noted 
-that much of our data is numerical, bar the categorical and ordinal columns of Province\_State and Date, respectively. 
-We chose to convert the date from a string type to datetime object type, to ease future parsing. 
-Using our contextual knowledge of our problem space, we chose to address the modeling problem from an individual 
-Province\_State perspective, i.e. we grouped our data by the Province\_State field. 
-From here on, we will refer to this “Province\_State” field simply as the “state”. 
-As a group we went back and forth on whether having so many models would result in higher variance due to the increased complexity of the model, 
-but we decided on separate models due to different restrictions imposed by policy makers on interstate travel and 
-the general thought that most people would be sheltering in place, and thus would not travel between states.
+
+Now moving on to actually wrangling the data for processing and straightforward
+input to our prospective models, we first needed to examine the existing data
+to analyze where help was needed. Upon inspection of data types, it is noted
+that much of our data is numerical, bar the categorical and ordinal columns of
+Province\_State and Date, respectively. We chose to convert the date from a
+string type to datetime object type, to ease future parsing. Using our
+contextual knowledge of our problem space, we chose to address the modeling
+problem from an individual Province\_State perspective, i.e. we grouped our
+data by the Province\_State field. From here on, we will refer to this
+“Province\_State” field simply as the “state”. As a group we went back and
+forth on whether having so many models would result in higher variance due to
+the increased complexity of the model, but we decided on separate models due to
+different restrictions imposed by policy makers on interstate travel and the
+general thought that most people would be sheltering in place, and thus would
+not travel between states.
 
 \subsection{Round 1}
-Our initial imputation strategy went as follows: 
-We examined each state’s numeric data column by column. If null values comprised more than 70\% of the total data in the column, 
-we dropped the entire column; otherwise, we replaced all null values with the median value in our column. 
-After noting that this approach led to “plateaus” in our data, we tried linearly interpolating the values in each column. 
-This approach produces more organic data in each column, but fails to impute data at the beginning of a time series 
-(due to having no “base point” to interpolate off of). Because our current models treat every column separately, 
-we don’t anticipate that this will cause issues; we can drop NaN values to create new “columns” that are perfectly interpolated, but start at a later date.  
-\\
-After interpolating the data, we normalized it to zero mean unit variance. 
-At this time, we are still considering whether to normalize the data globally or within a single column. 
-Intuition would suggest that a column-wise approach would be best. We performed these steps before really definitively knowing 
-what sort of modeling approach we were interested in taking, as we will discuss, this normalization was ultimately unused, 
-since we were working with more direct regression methods that did not benefit from this scaling, but did drop the null data points.
+
+Our initial imputation strategy went as follows: We examined each state’s
+numeric data column by column. If null values comprised more than 70\% of the
+total data in the column, we dropped the entire column; otherwise, we replaced
+all null values with the median value in our column. After noting that this
+approach led to “plateaus” in our data, we tried linearly interpolating the
+values in each column. This approach produces more organic data in each column,
+but fails to impute data at the beginning of a time series (due to having no
+“base point” to interpolate off of). Because our current models treat every
+column separately, we don’t anticipate that this will cause issues; we can drop
+NaN values to create new “columns” that are perfectly interpolated, but start
+at a later date.  
+
+After interpolating the data, we normalized it to zero mean unit variance. At
+this time, we are still considering whether to normalize the data globally or
+within a single column. Intuition would suggest that a column-wise approach
+would be best. We performed these steps before really definitively knowing what
+sort of modeling approach we were interested in taking, as we will discuss,
+this normalization was ultimately unused, since we were working with more
+direct regression methods that did not benefit from this scaling, but did drop
+the null data points.
 
 \subsection{Round 2}
-At this point in time, we decided on scrapping our explorations of different forecasting implementations to be detailed below, 
-and focused on univariate feature fitting methodologies for forecasting a function to fit the observed count of confirmed cases and deaths, 
-namely that of Holt-Winters exponential smoothing, ARIMA for forecasting, and a simple linear model from a particular day offset. 
-As a result, we did not normalize our data and just allowed the models to drop the null values from the training dataset.
+
+At this point in time, we decided on scrapping our explorations of different
+forecasting implementations to be detailed below, and focused on univariate
+feature fitting methodologies for forecasting a function to fit the observed
+count of confirmed cases and deaths, namely that of Holt-Winters exponential
+smoothing, ARIMA for forecasting, and a simple linear model from a particular
+day offset. As a result, we did not normalize our data and just allowed the
+models to drop the null values from the training dataset.
+
+
 \section{Problem Definition}
-%% TODO: might be a bit too long and too detailed not sure what to edit so I just wrote a lot (easier to cut than to write more)
-Currently with surging cases and deaths, the medical infrastructure in the United States cannot keep up. They cannot prepare for these pandemic surges and thus would need to find a way to predict when they will happen. Thus, the problem set to be solved in these experiments is to create a method utilizing the foundations and skills learned from CS 145 at UCLA to predict the cases in each state of the United States for a given amount of time. 
+
+%% TODO: might be a bit too long and too detailed 
+%% not sure what to edit so I just wrote a lot (easier to cut than to write more)
+
+Currently with surging cases and deaths, the medical infrastructure in the
+United States cannot keep up. They cannot prepare for these pandemic surges and
+thus would need to find a way to predict when they will happen. Thus, the
+problem set to be solved in these experiments is to create a method utilizing
+the foundations and skills learned from CS 145 at UCLA to predict the cases in
+each state of the United States for a given amount of time. 
 
 %%TODO: cite the dataset
-The competition is divided into 2 rounds. The first round was to predict the case and death count of each of the 50 states from September 1st to September 26th given any COVID-19 related data from April 12th to August 31st. The second round was to predict the case and death count of each of the 50 states during the winter holiday surge, specifically from December 7th to December 12th. For the second round, the method can train on any any COVID-19 related data from April 12th to December 6th. 
-The accuracy of the prediction will be evaluated with the mean absolute percentage error (MAPE) which averages the absolute error on all data points. Equation is given below.
+
+The competition is divided into 2 rounds. The first round was to predict the
+case and death count of each of the 50 states from September 1st to September
+26th given any COVID-19 related data from April 12th to August 31st. The second
+round was to predict the case and death count of each of the 50 states during
+the winter holiday surge, specifically from December 7th to December 12th. For
+the second round, the method can train on any any COVID-19 related data from
+April 12th to December 6th. 
+
+The accuracy of the prediction will be evaluated with the mean absolute
+percentage error (MAPE) which averages the absolute error on all data points.
+Equation is given below.
 
 $$MAPE = \frac{1}{n} \sum_{i = 1}^{n} |\frac{p_i - a_i}{a_i} |$$
 
-$n$ symbolizes the size of the dataset. $p_i$ symbolizes the predicted value at index $i$. $a_i$ symbolizes the actual value at index $i$.
+$n$ symbolizes the size of the dataset. $p_i$ symbolizes the predicted value at
+index $i$. $a_i$ symbolizes the actual value at index $i$.
+
 
 \section{Model Performance}
 \subsection{Linear Regression}
@@ -118,22 +171,41 @@ $n$ symbolizes the size of the dataset. $p_i$ symbolizes the predicted value at 
 \subsection{Exponential Smoothing}
 \subsection{Long Short Term Memory Neural Networks}
 
-Neural networks are shown to be incredibly malleable since there is a plentiful amount of hyperparameters to tune and to create ranging from the type of activation function to the architecture of the network. For sequential data specifically, recurrent neural networks or RNNs work well mostly because it allows previous outputs to be used as inputs while having hidden states. 
+Neural networks are shown to be incredibly malleable since there is a plentiful
+amount of hyperparameters to tune and to create ranging from the type of
+activation function to the architecture of the network. For sequential data
+specifically, recurrent neural networks or RNNs work well mostly because it
+allows previous outputs to be used as inputs while having hidden states. 
 
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{figures/architecture-rnn-ltr.png}
-  \caption{Example of RNN: $x$ is the input, $y$ is the output, the middle blue cells are a part of the hidden layer}
+  \caption{Example of RNN: $x$ is the input, $y$ is the output, the middle blue
+  cells are a part of the hidden layer}
   \label{fig:rnn}
 \end{figure}
 
- In the context of time series prediction and the task at hand, RNNs work well since it can utilize previous timestamped or predicted data to predict other output data. Inside each layer and node are specific functions that manipulate the inputs known as gates.
+In the context of time series prediction and the task at hand, RNNs work well
+since it can utilize previous timestamped or predicted data to predict other
+output data. Inside each layer and node are specific functions that manipulate
+the inputs known as gates.
 
-Within the context of RNNs, there is a set of specific RNNs called Long Short Term Memory Neural Networks or LSTM for short. What is specific of the LSTM is that it utilizes a specific set of 3 gates: an update, output, relvance, and forget gate \cite{LSTMlecture}. This allows LSTM neural networks to regulate the flow of information and decide how much past data affects the current prediction, generalizing better for time-series specific tasks.
+Within the context of RNNs, there is a set of specific RNNs called Long Short
+Term Memory Neural Networks or LSTM for short. What is specific of the LSTM is
+that it utilizes a specific set of 3 gates: an update, output, relvance, and
+forget gate \cite{LSTMlecture}. This allows LSTM neural networks to regulate
+the flow of information and decide how much past data affects the current
+prediction, generalizing better for time-series specific tasks.
 
-Given this context, and before using this method as our main modeling choice, we needed to validate this method. Using the PyTorch neural network framework \cite{Pytorch}, a simple RNN neural network of 1 layer with 50 LSTM nodes was tested on a subset of the round 1 data. 
+Given this context, and before using this method as our main modeling choice,
+we needed to validate this method. Using the PyTorch neural network framework
+\cite{Pytorch}, a simple RNN neural network of 1 layer with 50 LSTM nodes was
+tested on a subset of the round 1 data. 
 
-The experimentation procedure would use the confirmed case and death count data from April 12th to August 17th for the state of California and then validating the MAPE over a period of 14 days, August 18th to August 31st. The neural network will be trained over a varied amount of epochs and learning rates. 
+The experimentation procedure would use the confirmed case and death count data
+from April 12th to August 17th for the state of California and then validating
+the MAPE over a period of 14 days, August 18th to August 31st. The neural
+network will be trained over a varied amount of epochs and learning rates. 
 
 \begin{figure}
   \centering
@@ -142,9 +214,14 @@ The experimentation procedure would use the confirmed case and death count data 
   \label{fig:LSTM_trial}
 \end{figure}
 
-Attached on Figure  \ref{fig:LSTM_trial} is an example trial run of our prediction using the PyTorch neural network. The MAPE on this was around $6.93$ which was much higher than the other methods.
+Attached on Figure  \ref{fig:LSTM_trial} is an example trial run of our
+prediction using the PyTorch neural network. The MAPE on this was around $6.93$
+which was much higher than the other methods.
 
-Given with the lackluster results, amount of time required to tune each parameter, and the non-deterministic nature of neural networks, the use of LSTM neural networks was not really explored deeply with the rest of the dataset.
+Given the lackluster results, amount of time required to tune each parameter,
+and the non-deterministic nature of neural networks, the use of LSTM neural
+networks was not really explored deeply with the rest of the dataset.
+
 \subsection{Conclusions}
 
 While the HOLT model typically gives us the lowest overall MAPE, it
@@ -162,7 +239,7 @@ grid search on each model's hyperparameters, we developed a group of
 parameterized models that handle general state data reasonably well. 
 
 
-\section{Predictor Design}
+\section{Final Model Design}
 
 The pros and cons (as well as the relative efficacy) of each model have already
 been discussed. Faced with such a diversity of model performance, we opted to
@@ -202,9 +279,7 @@ wrote a Python script that trained the given models (using \cite{scikit-learn}'s
 the \cite{statsmodels} library). We then used the library routines to give us
 time series predictions for the required number of days. 
 
-
 \subsection{Round 2}
-
 
 After completing Round 1 of the project, we began to realize that manually
 cherry-picking an appropriate model for each state was not scalable. 
