@@ -456,7 +456,35 @@ after the training set were also not accurately forecasted.
 
 \subsection{Exponential Smoothing}
 
+Exponential Smoothing much like HOLT uses weighted averages to forecast ahead.
+It decreases the weights exponentially giving the smallest weights to the data
+furthest away and the largest weight to the closest data. Simple Exponential
+Smoothing is typically used for when there is no clear trend occurring. It uses
+2 equations, 1 for smoothing and the other for forecasting.
 
+\begin{center}
+    Forecast equation
+\end{center}
+\begin{equation}
+   y_{t+h|t} = l_t
+\end{equation}
+ \begin{center}
+    Smoothing equation
+\end{center}
+\begin{equation}
+l_t = \alpha y_t + (1 - \alpha)(l_{t-1})
+\end{equation}
+As you can see if you compare these equations to equations to the
+ones used by HOLT you will see there are very similar with only
+the $b_t$ term missing in both, as the $b_t$ is used for when
+there are trends. Even without the term the same explanations in
+HOLT apply here. In terms of implementation, we used the Exponential Smoothing
+module from the statsmodels
+package \cite{statsmodels}. With this module we were able to try different
+dampening levels. The dampening level tells the model how fast this model will
+approach a flat line in the future. This wielded very promising results of MAPE
+scores in the low 2.5s but, none of our models generated from exponential
+smoothing alone were able to perform better than HOLT.
 
 \subsection{Long Short Term Memory Neural Networks}
 
@@ -711,6 +739,8 @@ Estrada is JE; Justin Yi is JY; Shriniket Buche is SB; Yash Lala is YL.
          Normalization code & JY \\
          \hline
          Linear Regression testing & JE \\
+         \hline
+         Polynomial Fitting testing & JE \\
          \hline
          ARIMA testing & SB \\
          \hline
