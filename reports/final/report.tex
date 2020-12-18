@@ -560,6 +560,37 @@ forecast future time series data points \cite{TBATS}. The MAPE results it
 yielded from a simple validation on the last week of data were too  poor to
 necessitate further research and its complexity further hindered it.
 
+So far, all the methods discussed have been univariate methods. Given the richness
+of the dataset, we thought that an ideal model would be able to incorporate some of 
+the features that we had not yet used. The simplest multivariate time series model 
+that does not require that values of the features are known for when predicting is 
+Vector Autoregression (VAR). Similar to AR, VAR uses the values of the features at
+previous time steps to predict values of future timesteps. However, in this case,
+the output is a vector whose length is the number of features we input into the model
+and if we look at a VAR model of order 1 with two features, we get \cite{forecasting}
+\begin{equation}
+  y_{1,t} = c_1 + \phi_{11}y_{1,t-1} \phi_{12}y_{2,t-1} + \epsilon_{1,t}
+\end{equation}
+\begin{equation}
+  y_{2,t} = c_2 + \phi_{21}y_{1,t-1} \phi_{22}y_{2,t-1} + \epsilon_{2,t}
+\end{equation}
+As before, $\phi_{ij}$ are the weights to be learned. $c_i$ is the bias term and $\epsilon_{i,t}$ is 
+the white noise error term for that time step. 
+From equations 10 and 11, we see that $y_t \in \mathbb{R}^2$ since we have 2 features and
+the both values in the future timestep depends on a linear combination of  $y_{1,t-1}$ and $y_{2,t-2}$. There is
+thus an interplay with the features with each other to predict their values at the next 
+time step. To implement this model we used the vector\_ar module from the statsmodels 
+package \cite{statsmodels}. Like AR, VAR needs the data to be stationary so we differenced
+the data twice before applying VAR and unraveled our differenced values to get the actual
+predicted values. Initially when applying the model, we chose to use all features in order
+to get the most interplay and in our estimation the most accurate representation of 
+covid-19 cases and deaths in that state. However, when trying to apply the model, we ran into many 
+convergence and stationarity issues. After a process of trial and error, we found that 
+there were not errors in applying a VAR process when looking at deaths and confirmed cases together.
+While this was not making use of the full dataset as we wanted, it aws still better than a univariate
+process. Unfortunately, the predicted results were not ideal and resulted in a very poor MAPE. For some
+states like New York, the predicted cases decreased which cannot be applied to our round 2 submission, since
+our confirmed cases by definition are cumulative and thus non-decreasing.
 
 \subsection{Conclusions}
 
