@@ -68,10 +68,51 @@ on the number of coronavirus cases, such as Holt and ARIMA, for different affect
 which are shown to be statistically significant. Different iterative methods, based on cubic spline interpolation and Euler's methods
 are more novel developments in pursuit of accurately representing the spread of the virus \cite{APPADU2020}.
 
+\section{Problem Definition}
+%% TODO: might be a bit too long and too detailed not sure what to edit so I just wrote a lot (easier to cut than to write more)
+Currently with surging cases and deaths, the medical infrastructure in the United States cannot keep up. They cannot prepare for these pandemic surges and thus would need to find a way to predict when they will happen. Thus, the problem set to be solved in these experiments is to create a method utilizing the foundations and skills learned from CS 145 at UCLA to predict the cases in each state of the United States for a given amount of time. 
+
+%%TODO: cite the dataset
+The competition is divided into 2 rounds. The first round was to predict the case and death count of each of the 50 states from September 1st to September 26th given any COVID-19 related data from April 12th to August 31st. The second round was to predict the case and death count of each of the 50 states during the winter holiday surge, specifically from December 7th to December 12th. For the second round, the method can train on any any COVID-19 related data from April 12th to December 6th. 
+The accuracy of the prediction will be evaluated with the mean absolute percentage error (MAPE) which averages the absolute error on all data points. Equation is given below.
+
+$$MAPE = \frac{1}{n} \sum_{i = 1}^{n} |\frac{p_i - a_i}{a_i} |$$
+
+$n$ symbolizes the size of the dataset. $p_i$ symbolizes the predicted value at index $i$. $a_i$ symbolizes the actual value at index $i$.
+
 \section{Model Performance}
 \subsection{Linear Regression}
 \subsection{ARIMA}
-\subsection{HOLT}
+\subsection{Exponential Smoothing}
+\subsection{Long Short Term Memory Neural Networks}
+
+Neural networks are shown to be incredibly malleable since there is a plentiful amount of hyperparameters to tune and to create ranging from the type of activation function to the architecture of the network. For sequential data specifically, recurrent neural networks or RNNs work well mostly because it allows previous outputs to be used as inputs while having hidden states. 
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{figures/architecture-rnn-ltr.png}
+  \caption{Example of RNN: $x$ is the input, $y$ is the output, the middle blue cells are a part of the hidden layer}
+  \label{fig:rnn}
+\end{figure}
+
+ In the context of time series prediction and the task at hand, RNNs work well since it can utilize previous timestamped or predicted data to predict other output data. Inside each layer and node are specific functions that manipulate the inputs known as gates.
+
+Within the context of RNNs, there is a set of specific RNNs called Long Short Term Memory Neural Networks or LSTM for short. What is specific of the LSTM is that it utilizes a specific set of 3 gates: an update, output, relvance, and forget gate \cite{LSTMlecture}. This allows LSTM neural networks to regulate the flow of information and decide how much past data affects the current prediction, generalizing better for time-series specific tasks.
+
+Given this context, and before using this method as our main modeling choice, we needed to validate this method. Using the PyTorch neural network framework \cite{Pytorch}, a simple RNN neural network of 1 layer with 50 LSTM nodes was tested on a subset of the round 1 data. 
+
+The experimentation procedure would use the confirmed case and death count data from April 12th to August 17th for the state of California and then validating the MAPE over a period of 14 days, August 18th to August 31st. The neural network will be trained over a varied amount of epochs and learning rates. 
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{figures/LSTMPytorch.png}
+  \caption{LSTM predictions on data pertaining to California}
+  \label{fig:LSTM_trial}
+\end{figure}
+
+Attached on Figure  \ref{fig:LSTM_trial} is an example trial run of our prediction using the PyTorch neural network. The MAPE on this was around $6.93$ which was much higher than the other methods.
+
+Given with the lackluster results, amount of time required to tune each parameter, and the non-deterministic nature of neural networks, the use of LSTM neural networks was not really explored deeply with the rest of the dataset.
 \subsection{Conclusions}
 
 While the HOLT model typically gives us the lowest overall MAPE, it
