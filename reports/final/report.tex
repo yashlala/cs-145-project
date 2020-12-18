@@ -36,14 +36,34 @@
 \renewcommand{\shortauthors}{Team 22}
 
 \begin{abstract}
-
-TODO
-
+COVID-19, the theme of our CS 145 project, has been classified as a worldwide pandemic. 
+The rate of its spread is a complex function of local social distancing, government policy, 
+climate, and temporal factors, just to name a few. Detailed analysis of all of these contributory 
+causes is not humanly possible. However, we can build reasonably accurate disease models by using the 
+Data Mining techniques taught in CS 145. This report documents our team’s efforts towards analyzing 
+COVID-related data in over the majority of the year to allow for predictive forecasting. 
+We catalogue our the problem at hand, initial data preprocessing, exploratory efforts toward modeling our problem, 
+and our future predictions as we construct a model capable of predicting fatalities caused by COVID-19, 
+namely through the use of a hybrid linear, exponential, and autoregressive models. 
 \end{abstract}
 
 \maketitle
 
-\section{Introduction}
+\section{Introduction of overall goal and background}
+The increasing spread of COVID-19 poses a substantial impact on the status of global health and economy, 
+and having accurate forecasts of the number of affected can better inform local and national governmental 
+bodies to make decisions to promote public health and safety and keeping the economy afloat. 
+As we position to tackle this problem, we inspect our the data we have on hand: we were given reports of various 
+state-wide features of the COVID-19 infection profile from as early as April, we are specifically interested in the ability 
+to predict the number of cases and deaths for a particular state.
+
+\section{Related Work}
+Notable advances in this domain are noted, Nesteruk \cite{Nesteruk} employs the Susceptible, Infected, Removed (SIR) paradigm
+– which aims to find different correlated differential equations to model flow between different partitions of the 
+studied population – and the subsequent progression of the pandemic. Yonar \cite{EJMO} uses different more direct curve estimation methods
+on the number of coronavirus cases, such as Holt and ARIMA, for different affected countries of interest, (e.g. Germany, Japan, Turkey, UK, .etc),
+which are shown to be statistically significant. Different iterative methods, based on cubic spline interpolation and Euler's methods
+are more novel developments in pursuit of accurately representing the spread of the virus.
 
 \section{Model Performance}
 \subsection{Linear Regression}
